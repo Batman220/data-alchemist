@@ -40,6 +40,11 @@ input,button{font-family:'Plus Jakarta Sans',sans-serif}
 .card:hover{box-shadow:0 8px 36px rgba(2,132,199,.1);transform:translateY(-2px)}
 .inp{width:100%;background:#F4F9FF;border:1.5px solid var(--bdr2);border-radius:13px;padding:12px 15px;font-size:14px;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s}
 .inp:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(2,132,199,.12)}
+.inp-dark{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:13px;padding:12px 15px;font-size:14px;color:#E8F2FF;outline:none;transition:border-color .2s,box-shadow .2s}
+.inp-dark::placeholder{color:rgba(255,255,255,.22)}
+.inp-dark:focus{border-color:rgba(139,92,246,.7);box-shadow:0 0 0 3px rgba(139,92,246,.15),0 0 12px rgba(139,92,246,.1)}
+@keyframes orbPulse{0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}}
+@keyframes starTwinkle{0%,100%{opacity:.2;r:1}50%{opacity:.9;r:2}}
 </style>
 </head>
 <body>
@@ -283,60 +288,121 @@ const Dots = ({c}) => (
 
 // ─── ANIMATED BG ──────────────────────────────────────────────────────────
 const DataBg = () => {
-  const pills = [
-    {x:5,  y:10,  label:"DQ",      sub:"Data Quality",    c:"#0284C7", a:"floatA 6s ease-in-out infinite"},
-    {x:84, y:7,   label:"MDM",     sub:"Golden Record",   c:"#D97706", a:"floatB 7.5s ease-in-out infinite 1s"},
-    {x:91, y:68,  label:"DG",      sub:"Governance",      c:"#6D28D9", a:"floatC 8s ease-in-out infinite .5s"},
-    {x:4,  y:76,  label:"AI",      sub:"AI-Native",       c:"#C026D3", a:"floatA 5.5s ease-in-out infinite 2s"},
-    {x:44, y:3,   label:"ETL/ELT", sub:"Integration",     c:"#0891B2", a:"floatB 6.5s ease-in-out infinite 1.5s"},
-    {x:48, y:91,  label:"PUB",     sub:"Publication",     c:"#E11D48", a:"floatC 7s ease-in-out infinite .8s"},
-    {x:72, y:82,  label:"SS",      sub:"Data Sources",    c:"#059669", a:"floatA 7s ease-in-out infinite 0.4s"},
-    {x:20, y:88,  label:"MDM",     sub:"Master Data",     c:"#D97706", a:"floatB 9s ease-in-out infinite 2.2s"},
+  const glows = [
+    {x:8,  y:14, color:"#10B981", r:380},
+    {x:86, y:8,  color:"#06B6D4", r:320},
+    {x:93, y:66, color:"#3B82F6", r:300},
+    {x:50, y:90, color:"#F59E0B", r:340},
+    {x:4,  y:74, color:"#F43F5E", r:280},
+    {x:38, y:4,  color:"#8B5CF6", r:260},
+    {x:70, y:47, color:"#D946EF", r:240},
   ];
+  const cards = [
+    {x:4,  y:9,  icon:"🗄️", label:"Source Systems",  color:"#34D399", delay:"0s"},
+    {x:83, y:5,  icon:"⚙️",  label:"ETL / ELT",       color:"#22D3EE", delay:".9s"},
+    {x:91, y:63, icon:"🔬",  label:"Data Quality",     color:"#60A5FA", delay:"1.7s"},
+    {x:45, y:88, icon:"🏆",  label:"MDM",              color:"#FBBF24", delay:"2.5s"},
+    {x:2,  y:70, icon:"📡",  label:"Publication",      color:"#FB7185", delay:"1.3s"},
+    {x:36, y:2,  icon:"⚖️",  label:"Governance",       color:"#C084FC", delay:".5s"},
+    {x:68, y:44, icon:"🤖",  label:"AI-Native Future", color:"#E879F9", delay:"2.1s"},
+  ];
+  const stars = Array.from({length:35},(_,i)=>({
+    x:(i*37+13)%100, y:(i*59+7)%100,
+    s:i%4===0?2.5:i%3===0?1.8:1.2, d:(i*0.28)%3.5
+  }));
   const lines = [
-    {x1:"7%",y1:"13%",x2:"48%",y2:"5%"}, {x1:"48%",y1:"5%",x2:"86%",y2:"9%"},
-    {x1:"86%",y1:"9%",x2:"93%",y2:"70%"},{x1:"93%",y1:"70%",x2:"50%",y2:"92%"},
-    {x1:"50%",y1:"92%",x2:"6%",y2:"78%"},{x1:"6%",y1:"78%",x2:"7%",y2:"13%"},
-    {x1:"48%",y1:"5%",x2:"50%",y2:"92%"},{x1:"7%",y1:"13%",x2:"93%",y2:"70%"},
+    ["6%","12%","38%","4%"],["38%","4%","85%","7%"],["85%","7%","93%","65%"],
+    ["93%","65%","50%","90%"],["50%","90%","4%","73%"],["4%","73%","6%","12%"],
+    ["38%","4%","70%","46%"],["70%","46%","50%","90%"],["6%","12%","93%","65%"],
   ];
-  const dots = [
-    {cx:"28%",cy:"32%"},{cx:"68%",cy:"22%"},{cx:"18%",cy:"58%"},{cx:"74%",cy:"52%"},
-    {cx:"43%",cy:"68%"},{cx:"62%",cy:"78%"},{cx:"14%",cy:"42%"},{cx:"87%",cy:"38%"},
-    {cx:"35%",cy:"82%"},{cx:"78%",cy:"62%"},
+  const nodeData = [
+    ["6%","12%","#34D399"],["38%","4%","#22D3EE"],["85%","7%","#60A5FA"],
+    ["93%","65%","#A78BFA"],["50%","90%","#FBBF24"],["4%","73%","#FB7185"],["70%","46%","#E879F9"],
   ];
+
   return (
-    <div style={{position:"fixed",inset:0,zIndex:0,overflow:"hidden",pointerEvents:"none"}}>
-      <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 65% 55% at 15% 15%,rgba(2,132,199,.07) 0%,transparent 65%),radial-gradient(ellipse 55% 65% at 85% 85%,rgba(109,40,217,.07) 0%,transparent 65%),radial-gradient(ellipse 45% 45% at 50% 50%,rgba(217,119,6,.04) 0%,transparent 60%)"}}/>
+    <div style={{position:"fixed",inset:0,zIndex:0,overflow:"hidden",pointerEvents:"none",
+      background:"linear-gradient(135deg,#040C1E 0%,#080F25 35%,#0C0A22 65%,#050C1A 100%)"}}>
+
+      {/* Vivid radial glows — one per module */}
+      {glows.map((g,i)=>(
+        <div key={i} style={{position:"absolute",left:`${g.x}%`,top:`${g.y}%`,
+          width:g.r,height:g.r,borderRadius:"50%",
+          background:`radial-gradient(circle, ${g.color}1E 0%, ${g.color}0A 45%, transparent 70%)`,
+          transform:"translate(-50%,-50%)",filter:"blur(2px)",
+          animation:`orbPulse ${7+i*1.3}s ease-in-out ${i*.55}s infinite`}}/>
+      ))}
+
+      {/* Dot grid */}
+      <div style={{position:"absolute",inset:0,
+        backgroundImage:"radial-gradient(circle,rgba(148,163,184,.08) 1px,transparent 1px)",
+        backgroundSize:"44px 44px"}}/>
+
+      {/* SVG: connection lines + node rings + star field */}
       <svg style={{position:"absolute",inset:0,width:"100%",height:"100%"}}>
-        {lines.map((l,i)=>(
-          <line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2}
-            stroke="#B8D4EA" strokeWidth="1" strokeDasharray="5 9" opacity=".5"
-            style={{animation:`dashFlow ${9+i}s linear infinite`}}/>
+        <defs>
+          <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#60A5FA" stopOpacity=".45"/>
+            <stop offset="100%" stopColor="#A78BFA" stopOpacity=".45"/>
+          </linearGradient>
+          <linearGradient id="lg2" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#34D399" stopOpacity=".35"/>
+            <stop offset="100%" stopColor="#22D3EE" stopOpacity=".35"/>
+          </linearGradient>
+          <filter id="ng"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        {/* Animated dashed connection lines */}
+        {lines.map(([x1,y1,x2,y2],i)=>(
+          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
+            stroke={i%2===0?"url(#lg1)":"url(#lg2)"}
+            strokeWidth={i%3===0?"1.5":"1"} strokeDasharray="6 11" opacity=".5"
+            style={{animation:`dashFlow ${11+i*1.8}s linear ${i*.25}s infinite`}}/>
         ))}
-        {dots.map((p,i)=>(
-          <circle key={i} cx={p.cx} cy={p.cy} r="3.5" fill="#94A3B8"
-            style={{animation:`nodePulse ${3+i*.45}s ease-in-out infinite ${i*.28}s`}}/>
+        {/* Glowing node rings */}
+        {nodeData.map(([cx,cy,col],i)=>(
+          <g key={i} filter="url(#ng)">
+            <circle cx={cx} cy={cy} r="8" fill="none" stroke={col} strokeWidth="1" opacity=".3"
+              style={{animation:`nodePulse ${3.5+i*.5}s ease-in-out ${i*.4}s infinite`}}/>
+            <circle cx={cx} cy={cy} r="4" fill="none" stroke={col} strokeWidth="1.5" opacity=".7"
+              style={{animation:`nodePulse ${3.5+i*.5}s ease-in-out ${i*.4}s infinite`}}/>
+            <circle cx={cx} cy={cy} r="2" fill={col} opacity="1"/>
+          </g>
         ))}
+        {/* Star field */}
+        {stars.map((s,i)=>(
+          <circle key={i} cx={`${s.x}%`} cy={`${s.y}%`} r={s.s}
+            fill="rgba(255,255,255,.4)"
+            style={{animation:`nodePulse ${2.5+s.d}s ease-in-out ${s.d}s infinite`}}/>
+        ))}
+        {/* Large faint orbit rings */}
+        <ellipse cx="50%" cy="50%" rx="42%" ry="44%" fill="none"
+          stroke="rgba(139,92,246,.05)" strokeWidth="1"
+          strokeDasharray="8 20"
+          style={{animation:"orbit 120s linear infinite",transformOrigin:"50% 50%"}}/>
+        <ellipse cx="50%" cy="50%" rx="30%" ry="32%" fill="none"
+          stroke="rgba(34,211,238,.04)" strokeWidth="1"
+          strokeDasharray="6 16"
+          style={{animation:"orbit 80s linear reverse infinite",transformOrigin:"50% 50%"}}/>
       </svg>
-      {pills.map((n,i)=>(
-        <div key={i} style={{position:"absolute",left:`${n.x}%`,top:`${n.y}%`,
-          background:n.c+"10",border:`1.5px solid ${n.c}28`,borderRadius:13,
-          padding:"7px 14px",animation:n.a}}>
-          <div style={{fontSize:12,fontWeight:800,color:n.c,fontFamily:"Bricolage Grotesque,sans-serif",letterSpacing:1}}>{n.label}</div>
-          <div style={{fontSize:10,color:n.c+"99",marginTop:1,whiteSpace:"nowrap"}}>{n.sub}</div>
+
+      {/* Floating module cards */}
+      {cards.map((c,i)=>(
+        <div key={i} style={{position:"absolute",left:`${c.x}%`,top:`${c.y}%`,
+          background:"rgba(4,12,30,.65)",
+          border:`1px solid ${c.color}30`,borderRadius:14,padding:"9px 15px",
+          backdropFilter:"blur(16px)",
+          boxShadow:`0 0 22px ${c.color}18, 0 4px 20px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06)`,
+          animation:`floatA ${7.5+i*1.1}s ease-in-out ${c.delay} infinite`}}>
+          <div style={{display:"flex",alignItems:"center",gap:9}}>
+            <span style={{fontSize:17}}>{c.icon}</span>
+            <div style={{fontSize:10,fontWeight:800,color:c.color,letterSpacing:.8,
+              fontFamily:"Bricolage Grotesque,sans-serif",whiteSpace:"nowrap"}}>{c.label.toUpperCase()}</div>
+          </div>
+          {/* Subtle glow underline */}
+          <div style={{height:1.5,marginTop:5,borderRadius:4,
+            background:`linear-gradient(90deg,transparent,${c.color}55,transparent)`}}/>
         </div>
       ))}
-      <div style={{position:"absolute",top:"50%",left:"50%",
-        transform:"translate(-50%,-50%)",width:520,height:520,
-        animation:"orbit 45s linear infinite",opacity:.05}}>
-        <svg viewBox="0 0 520 520" width="520" height="520">
-          <circle cx="260" cy="260" r="210" fill="none" stroke="#0284C7" strokeWidth="1" strokeDasharray="4 14"/>
-          <circle cx="260" cy="260" r="145" fill="none" stroke="#6D28D9" strokeWidth="1" strokeDasharray="3 11"/>
-        </svg>
-      </div>
-      <div style={{position:"absolute",inset:0,
-        backgroundImage:"linear-gradient(rgba(2,132,199,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(2,132,199,.035) 1px,transparent 1px)",
-        backgroundSize:"64px 64px"}}/>
     </div>
   );
 };
@@ -385,17 +451,19 @@ const QuoteRotator = () => {
   const catColor = { data:"#0284C7", ai:"#6D28D9", "dq-ai":"#D97706" }[q.cat];
   const catBg    = { data:"#E0F2FE", ai:"#F5F3FF", "dq-ai":"#FFFBEB" }[q.cat];
   return (
-    <div style={{marginTop:16,background:"#FAFBFF",border:"1.5px solid #E2E8F0",
+    <div style={{marginTop:18,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.08)",
       borderRadius:14,padding:"14px 18px",transition:"opacity .4s",opacity:fade?1:0,
-      minHeight:76,display:"flex",flexDirection:"column",justifyContent:"center"}}>
+      minHeight:78,display:"flex",flexDirection:"column",justifyContent:"center",
+      boxShadow:"inset 0 1px 0 rgba(255,255,255,.04)"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}}>
         <span style={{fontSize:10,fontWeight:700,letterSpacing:1,
-          color:catColor,background:catBg,borderRadius:8,padding:"2px 9px"}}>
+          color:catColor,background:`${catBg}18`,border:`1px solid ${catColor}30`,
+          borderRadius:8,padding:"2px 9px"}}>
           {CAT_LABELS[q.cat]}
         </span>
-        <span style={{fontSize:9,color:"#CBD5E1"}}>{idx+1}/{QUOTES.length}</span>
+        <span style={{fontSize:9,color:"rgba(255,255,255,.2)"}}>{idx+1}/{QUOTES.length}</span>
       </div>
-      <div style={{fontSize:12.5,color:"#1A3050",lineHeight:1.75,fontStyle:"italic",marginBottom:6}}>
+      <div style={{fontSize:12.5,color:"rgba(255,255,255,.62)",lineHeight:1.75,fontStyle:"italic",marginBottom:6}}>
         "{q.q}"
       </div>
       <div style={{fontSize:11,fontWeight:700,color:catColor}}>— {q.a}</div>
@@ -447,102 +515,166 @@ const Lock = ({onUnlock}) => {
     <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",
       padding:24,position:"relative",zIndex:10}}>
       <DataBg/>
-      <div className="fu" style={{width:"100%",maxWidth:520,background:"rgba(255,255,255,.95)",
-        border:"1.5px solid #D9E8F7",borderRadius:28,padding:40,
-        boxShadow:"0 24px 70px rgba(2,132,199,.14)",backdropFilter:"blur(14px)",position:"relative",zIndex:1}}>
+      <div className="fu" style={{width:"100%",maxWidth:700,
+        background:"rgba(6,12,28,.88)",
+        border:"1px solid rgba(255,255,255,.09)",
+        borderRadius:32,padding:"44px 48px",
+        boxShadow:"0 0 0 1px rgba(139,92,246,.12), 0 40px 100px rgba(0,0,0,.7), 0 0 60px rgba(139,92,246,.06), inset 0 1px 0 rgba(255,255,255,.07)",
+        backdropFilter:"blur(28px)",position:"relative",zIndex:1,overflow:"hidden"}}>
+
+        {/* Rainbow top bar */}
+        <div style={{position:"absolute",top:0,left:0,right:0,height:3,borderRadius:"32px 32px 0 0",
+          background:"linear-gradient(90deg,#34D399 0%,#22D3EE 18%,#60A5FA 35%,#A78BFA 52%,#F472B6 68%,#FBBF24 84%,#34D399 100%)",
+          opacity:.9}}/>
+
+        {/* Subtle inner corner glow */}
+        <div style={{position:"absolute",top:-60,right:-60,width:220,height:220,borderRadius:"50%",
+          background:"radial-gradient(circle,rgba(139,92,246,.12) 0%,transparent 70%)",pointerEvents:"none"}}/>
+        <div style={{position:"absolute",bottom:-80,left:-60,width:260,height:260,borderRadius:"50%",
+          background:"radial-gradient(circle,rgba(34,211,238,.08) 0%,transparent 70%)",pointerEvents:"none"}}/>
 
         {/* Raja branding */}
-        <div style={{background:"linear-gradient(135deg,#F2F7FF,#EEF2FF)",border:"1.5px solid #D9E8F7",
-          borderRadius:20,padding:"18px 20px",marginBottom:28,display:"flex",alignItems:"center",gap:16}}>
+        <div style={{background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.07)",
+          borderRadius:20,padding:"18px 20px",marginBottom:28,display:"flex",alignItems:"center",gap:16,
+          backdropFilter:"blur(8px)",boxShadow:"inset 0 1px 0 rgba(255,255,255,.05)"}}>
           <div style={{position:"relative",flexShrink:0}}>
+            <div style={{position:"absolute",inset:-3,borderRadius:"50%",
+              background:"linear-gradient(135deg,#34D399,#60A5FA,#A78BFA,#F472B6)",
+              opacity:.7,animation:"orbit 8s linear infinite"}}/>
             <img src={AVATAR} alt="Raja Shahnawaz Soni"
-              style={{width:72,height:72,borderRadius:"50%",border:"3px solid #fff",
-                boxShadow:"0 4px 16px rgba(2,132,199,.25)",display:"block"}}/>
+              style={{width:72,height:72,borderRadius:"50%",border:"2.5px solid rgba(6,12,28,1)",
+                display:"block",position:"relative",zIndex:1}}/>
             <div style={{position:"absolute",bottom:2,right:2,width:16,height:16,
-              background:"#10B981",borderRadius:"50%",border:"2px solid #fff"}}/>
+              background:"#10B981",borderRadius:"50%",border:"2.5px solid rgba(6,12,28,1)",zIndex:2}}/>
           </div>
           <div style={{flex:1}}>
-            <div className="dsp" style={{fontSize:16,fontWeight:800,color:"#08142A",
+            <div className="dsp" style={{fontSize:16,fontWeight:800,color:"#EFF6FF",
               letterSpacing:"-.3px",marginBottom:4}}>Raja Shahnawaz Soni</div>
-            <div style={{fontSize:11,color:"#4A6FA5",letterSpacing:".8px",
+            <div style={{fontSize:11,color:"rgba(255,255,255,.4)",letterSpacing:".9px",
               marginBottom:9,fontWeight:600}}>MDM PRACTITIONER · AI-POWERED DATA MANAGEMENT</div>
             <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
-              <a href="mailto:raja.cloudmdm@gmail.com"
-                style={{fontSize:11,color:"#0284C7",textDecoration:"none",background:"#E0F2FE",
-                  borderRadius:20,padding:"3px 10px",fontWeight:600}}>
-                📧 raja.cloudmdm@gmail.com
-              </a>
-              <a href={LINKEDIN} target="_blank" rel="noreferrer"
-                style={{fontSize:11,color:"#0284C7",textDecoration:"none",background:"#E0F2FE",
-                  borderRadius:20,padding:"3px 10px",fontWeight:600}}>
-                💼 LinkedIn
-              </a>
-              <a href="https://rajamdm.github.io" target="_blank" rel="noreferrer"
-                style={{fontSize:11,color:"#6D28D9",textDecoration:"none",background:"#F5F3FF",
-                  borderRadius:20,padding:"3px 10px",fontWeight:600}}>
-                🌐 rajamdm.github.io
-              </a>
+              {[
+                {label:"📧 raja.cloudmdm@gmail.com", href:"mailto:raja.cloudmdm@gmail.com", c:"#60A5FA", bg:"rgba(96,165,250,.1)"},
+                {label:"💼 LinkedIn", href:LINKEDIN, c:"#A78BFA", bg:"rgba(167,139,250,.1)"},
+                {label:"🌐 rajamdm.github.io", href:"https://rajamdm.github.io", c:"#34D399", bg:"rgba(52,211,153,.1)"},
+              ].map(b=>(
+                <a key={b.label} href={b.href} target="_blank" rel="noreferrer"
+                  style={{fontSize:11,color:b.c,textDecoration:"none",background:b.bg,
+                    border:`1px solid ${b.c}25`,borderRadius:20,padding:"3px 10px",fontWeight:600}}>
+                  {b.label}
+                </a>
+              ))}
             </div>
           </div>
         </div>
 
-        <div style={{textAlign:"center",marginBottom:28}}>
-          <h1 className="dsp" style={{fontSize:"2.4rem",fontWeight:800,color:"#08142A",
-            letterSpacing:"-1.5px",lineHeight:1.1,marginBottom:6}}>
-            The Data<br/>
-            <span style={{background:"linear-gradient(90deg,#0284C7,#6D28D9,#E11D48)",
-              WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Alchemist</span>
+        {/* Title + subtitle */}
+        <div style={{textAlign:"center",marginBottom:26}}>
+          <h1 className="dsp" style={{fontSize:"2.7rem",fontWeight:800,color:"#EFF6FF",
+            letterSpacing:"-1.5px",lineHeight:1.05,marginBottom:8}}>
+            The Data
+            <br/>
+            <span style={{background:"linear-gradient(90deg,#34D399 0%,#22D3EE 25%,#A78BFA 55%,#F472B6 80%,#FBBF24 100%)",
+              WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
+              backgroundSize:"200% 100%",
+              animation:"shimmer 4s ease-in-out infinite"}}>Alchemist</span>
           </h1>
-          <div style={{fontSize:11,letterSpacing:3,color:"#7A9CC4",fontWeight:600}}>
-            DQ · MDM · PUBLICATION · GOVERNANCE
+          <div style={{fontSize:9.5,letterSpacing:3,color:"rgba(255,255,255,.28)",fontWeight:700,marginBottom:22}}>
+            SOURCE SYSTEMS · ETL/ELT · DATA QUALITY · MDM · PUBLICATION · GOVERNANCE
+          </div>
+
+          {/* Animated module journey strip */}
+          <style>{`
+            @keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+            @keyframes tileGlow{0%,100%{box-shadow:0 0 10px var(--tc,#60A5FA)20,inset 0 1px 0 rgba(255,255,255,.05)}50%{box-shadow:0 0 22px var(--tc,#60A5FA)40,0 0 40px var(--tc,#60A5FA)15,inset 0 1px 0 rgba(255,255,255,.08)}}
+            @keyframes flowPulse{0%{opacity:.15;transform:translateX(-4px)}50%{opacity:.7;transform:translateX(2px)}100%{opacity:.15;transform:translateX(-4px)}}
+          `}</style>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:0,
+            padding:"6px 0 2px",overflowX:"auto"}}>
+            {[
+              {icon:"🗄️", label:"Sources",    color:"#34D399", delay:"0s"},
+              {icon:"⚙️",  label:"ETL/ELT",   color:"#22D3EE", delay:".4s"},
+              {icon:"🔬",  label:"DQ",         color:"#60A5FA", delay:".8s"},
+              {icon:"🏆",  label:"MDM",        color:"#FBBF24", delay:"1.2s"},
+              {icon:"📡",  label:"Pub",        color:"#FB7185", delay:"1.6s"},
+              {icon:"↩️",  label:"Reverse",   color:"#34D399", delay:"2.0s"},
+              {icon:"⚖️",  label:"Gov",        color:"#C084FC", delay:"2.4s"},
+            ].map((d,i,arr)=>(
+              <React.Fragment key={d.label}>
+                <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:6,
+                  animation:`floatB ${3.5+i*.4}s ease-in-out ${d.delay} infinite`}}>
+                  <div style={{width:54,height:54,borderRadius:17,
+                    background:`radial-gradient(135deg at 30% 30%, ${d.color}20, rgba(255,255,255,.02))`,
+                    border:`1.5px solid ${d.color}38`,
+                    display:"flex",alignItems:"center",justifyContent:"center",fontSize:23,
+                    boxShadow:`0 0 18px ${d.color}25, inset 0 1px 0 rgba(255,255,255,.07)`,
+                    backdropFilter:"blur(8px)",
+                    animation:`tileGlow 3s ease-in-out ${d.delay} infinite`,
+                    ["--tc"]:d.color}}>
+                    {d.icon}
+                  </div>
+                  <div style={{fontSize:8.5,fontWeight:800,color:d.color,letterSpacing:.6,
+                    textAlign:"center",lineHeight:1.2}}>{d.label.toUpperCase()}</div>
+                </div>
+                {i<arr.length-1&&(
+                  <div style={{fontSize:13,color:"rgba(255,255,255,.18)",margin:"0 3px",marginBottom:20,
+                    animation:"flowPulse 1.8s ease-in-out infinite",animationDelay:`${i*.25}s`}}>→</div>
+                )}
+              </React.Fragment>
+            ))}
           </div>
         </div>
 
-        <div style={{display:"flex",flexDirection:"column",gap:13,marginBottom:18}}>
+        {/* Form */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:13,marginBottom:18}}>
           <div>
-            <label style={{fontSize:11,color:"#4A6FA5",display:"block",marginBottom:6,
-              fontWeight:700,letterSpacing:".6px"}}>
-              YOUR NAME <span style={{color:"#E11D48"}}>*</span>
+            <label style={{fontSize:11,color:"rgba(255,255,255,.38)",display:"block",marginBottom:6,
+              fontWeight:700,letterSpacing:".7px"}}>
+              YOUR NAME <span style={{color:"#FB7185"}}>*</span>
             </label>
-            <input className="inp" value={name} onChange={e=>setName(e.target.value)}
+            <input className="inp-dark" value={name} onChange={e=>setName(e.target.value)}
               placeholder="e.g. Priya Sharma, Ahmed Al-Rashidi…"/>
           </div>
           <div>
-            <label style={{fontSize:11,color:"#4A6FA5",display:"block",marginBottom:6,
-              fontWeight:700,letterSpacing:".6px"}}>EMAIL ADDRESS</label>
-            <input className="inp" value={email} onChange={e=>setEmail(e.target.value)}
+            <label style={{fontSize:11,color:"rgba(255,255,255,.38)",display:"block",marginBottom:6,
+              fontWeight:700,letterSpacing:".7px"}}>EMAIL ADDRESS</label>
+            <input className="inp-dark" value={email} onChange={e=>setEmail(e.target.value)}
               type="email" placeholder="your.email@domain.com"/>
           </div>
           <div>
-            <label style={{fontSize:11,color:"#4A6FA5",display:"block",marginBottom:6,
-              fontWeight:700,letterSpacing:".6px"}}>
-              ORGANISATION <span style={{color:"#94A3B8"}}>(optional)</span>
+            <label style={{fontSize:11,color:"rgba(255,255,255,.38)",display:"block",marginBottom:6,
+              fontWeight:700,letterSpacing:".7px"}}>
+              ORGANISATION <span style={{color:"rgba(255,255,255,.2)"}}>(optional)</span>
             </label>
-            <input className="inp" value={org} onChange={e=>setOrg(e.target.value)}
-              placeholder="e.g. Accenture, Deloitte, PwC, Self-learning…"/>
+            <input className="inp-dark" value={org} onChange={e=>setOrg(e.target.value)}
+              placeholder="e.g. Accenture, Deloitte, PwC…"/>
           </div>
           <div>
-            <label style={{fontSize:11,color:"#4A6FA5",display:"block",marginBottom:6,
-              fontWeight:700,letterSpacing:".6px"}}>
-              ANTHROPIC API KEY <span style={{color:"#E11D48"}}>*</span>
+            <label style={{fontSize:11,color:"rgba(255,255,255,.38)",display:"block",marginBottom:6,
+              fontWeight:700,letterSpacing:".7px"}}>
+              ANTHROPIC API KEY <span style={{color:"#FB7185"}}>*</span>
             </label>
-            <input className="inp" value={key} onChange={e=>setKey(e.target.value)}
+            <input className="inp-dark" value={key} onChange={e=>setKey(e.target.value)}
               onKeyDown={e=>e.key==="Enter"&&go()} type="password" placeholder="sk-ant-api03-…"/>
           </div>
         </div>
 
-        {err && (
-          <div style={{background:"#FFF1F2",border:"1.5px solid #FECDD3",borderRadius:12,
-            padding:"10px 14px",fontSize:13,color:"#BE123C",marginBottom:14}}>{err}</div>
+        {err&&(
+          <div style={{background:"rgba(251,113,133,.08)",border:"1px solid rgba(251,113,133,.25)",
+            borderRadius:12,padding:"10px 14px",fontSize:13,color:"#FB7185",marginBottom:14}}>{err}</div>
         )}
 
         <button onClick={go} disabled={loading}
-          style={{width:"100%",background:loading?"#CBD5E1":"linear-gradient(135deg,#0284C7,#6D28D9)",
-            border:"none",color:"#fff",borderRadius:14,padding:14,fontSize:15,fontWeight:700,
-            fontFamily:"Bricolage Grotesque,sans-serif",cursor:loading?"not-allowed":"pointer",
-            letterSpacing:".3px",boxShadow:loading?"none":"0 4px 20px rgba(2,132,199,.3)",
-            transition:"all .2s"}}>
-          {syncing ? "☁️ Restoring your session…" : loading ? "Verifying key…" : "Enter the Lab →"}
+          style={{width:"100%",
+            background:loading?"rgba(255,255,255,.05)":"linear-gradient(135deg,#059669 0%,#0284C7 35%,#6D28D9 68%,#D946EF 100%)",
+            border:loading?"1px solid rgba(255,255,255,.08)":"1px solid transparent",
+            color:loading?"rgba(255,255,255,.3)":"#fff",
+            borderRadius:14,padding:"15px 14px",fontSize:15,fontWeight:700,
+            fontFamily:"Bricolage Grotesque,sans-serif",
+            cursor:loading?"not-allowed":"pointer",letterSpacing:".4px",
+            boxShadow:loading?"none":"0 0 40px rgba(139,92,246,.35), 0 4px 24px rgba(0,0,0,.5)",
+            transition:"all .25s"}}>
+          {syncing?"☁️ Restoring your session…":loading?"Verifying key…":"Enter the Lab →"}
         </button>
 
         <QuoteRotator/>
@@ -1853,9 +1985,9 @@ const App = () => {
             {org ? " — "+org : ""} 👋
           </div>
         )}
-        <div className="fu" style={{fontSize:11,letterSpacing:3,color:"#7A9CC4",
+        <div className="fu" style={{fontSize:10,letterSpacing:2.5,color:"#7A9CC4",
           marginBottom:22,fontWeight:600,animationDelay:".2s"}}>
-          DQ · MDM · PUBLICATION · GOVERNANCE
+          SOURCE SYSTEMS · INTEGRATION (ETL/ELT) · DQ · MDM · PUBLICATION · REVERSE INTEGRATION · GOVERNANCE
         </div>
 
         <div className="fu" style={{display:"inline-flex",gap:12,flexWrap:"wrap",
