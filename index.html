@@ -1709,94 +1709,121 @@ Be thorough but sharp — no filler, no waffle.`;
 // ─── JOURNEY MAP ──────────────────────────────────────────────────────────
 const JMap = ({onClick}) => {
   const [showRI, setShowRI] = React.useState(false);
+  // Main pipeline — 5 nodes only (DG and AI are pervasive layers, not chain nodes)
+  const chain = [
+    {id:"ss",  label:"Source Systems", icon:"🗄️", done:true},
+    {id:"etl", label:"Integration",    icon:"⚙️",  done:true},
+    {id:"dq",  label:"Data Quality",   icon:"🔬",  active:true},
+    {id:"mdm", label:"MDM",            icon:"🏆"},
+    {id:"pub", label:"Publication",    icon:"📡"},
+  ];
+  const nodeStyle = (s) => {
+    const mod = MODS.find(m=>m.id===s.id), c = mod?.hex||"#94A3B8";
+    return {mod, c};
+  };
   return (
-  <div style={{background:"#fff",border:"1.5px solid #D9E8F7",borderRadius:22,
-    padding:"26px 24px 20px",marginBottom:28,overflow:"hidden"}}>
-    <div style={{fontSize:10,color:"#7A9CC4",letterSpacing:3,marginBottom:22,
+  <div style={{background:"#fff",border:"1.5px solid #D9E8F7",borderRadius:24,
+    padding:"28px 32px 24px",marginBottom:28}}>
+
+    <div style={{fontSize:10,color:"#7A9CC4",letterSpacing:3,marginBottom:20,
       textAlign:"center",fontWeight:700}}>
-      THE DATA MANAGEMENT JOURNEY · 7 MODULES + REVERSE INTEGRATION
+      THE DATA MANAGEMENT JOURNEY · 5-STAGE PIPELINE + REVERSE INTEGRATION
     </div>
 
-    {/* Forward flow */}
-    <div style={{display:"flex",alignItems:"center",justifyContent:"center",
-      flexWrap:"wrap",gap:0,rowGap:12}}>
-      {JOURNEY.map((s,i)=>{
-        const mod=MODS.find(m=>m.id===s.id), c=mod?.hex||"#94A3B8";
+    {/* ── Main pipeline row ── */}
+    <div style={{display:"flex",alignItems:"stretch",justifyContent:"center",gap:0}}>
+      {chain.map((s,i)=>{
+        const {mod,c} = nodeStyle(s);
         return (
-          <div key={s.id} style={{display:"flex",alignItems:"center"}}>
-            <div onClick={()=>mod&&onClick(s.id)}
-              style={{display:"flex",flexDirection:"column",alignItems:"center",
-                padding:"12px 16px",borderRadius:16,
-                background:s.done?"#F1F5F9":s.active?`${c}12`:"#F4F9FF",
-                border:s.done?"1.5px solid #CBD5E1":s.active?`2px solid ${c}`:"1.5px solid #D9E8F7",
-                cursor:mod?"pointer":"default",position:"relative",minWidth:82,transition:"all .15s"}}>
-              {s.done && (
-                <div style={{position:"absolute",top:-8,right:-8,background:"#10B981",
-                  borderRadius:"50%",width:22,height:22,display:"flex",alignItems:"center",
-                  justifyContent:"center",fontSize:12,color:"#fff",fontWeight:700}}>✓</div>
+          <React.Fragment key={s.id}>
+            <div style={{display:"flex",flexDirection:"column",alignItems:"center",flex:"1 1 0",maxWidth:160}}>
+              <div onClick={()=>mod&&onClick(s.id)}
+                style={{width:"100%",display:"flex",flexDirection:"column",alignItems:"center",
+                  padding:"14px 10px 12px",borderRadius:16,
+                  background:s.done?"#F1F5F9":s.active?`${c}12`:"#F4F9FF",
+                  border:s.done?"1.5px solid #CBD5E1":s.active?`2.5px solid ${c}`:"1.5px solid #D9E8F7",
+                  cursor:mod?"pointer":"default",position:"relative",transition:"all .15s",
+                  boxShadow:s.active?`0 4px 18px ${c}22`:"none"}}>
+                {s.done && (
+                  <div style={{position:"absolute",top:-9,right:-9,background:"#10B981",
+                    borderRadius:"50%",width:22,height:22,display:"flex",alignItems:"center",
+                    justifyContent:"center",fontSize:12,color:"#fff",fontWeight:700}}>✓</div>
+                )}
+                {s.active && (
+                  <div style={{position:"absolute",top:-9,right:-9,background:c,borderRadius:"50%",
+                    width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",
+                    fontSize:10,color:"#fff",fontWeight:700,animation:"pingDot 1.5s ease-in-out infinite"}}>▶</div>
+                )}
+                <div style={{fontSize:26,marginBottom:6}}>{s.icon}</div>
+                <div className={s.active?"dsp":""} style={{fontSize:10,textAlign:"center",
+                  color:s.done?"#94A3B8":s.active?c:"#7A9CC4",
+                  fontWeight:s.active?800:500,lineHeight:1.3}}>{s.label}</div>
+              </div>
+
+              {/* Reverse Integration return arrow — shows BELOW MDM only */}
+              {s.id==="mdm" && (
+                <div style={{marginTop:8,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+                  <div style={{fontSize:9,color:"#059669",fontWeight:700,letterSpacing:.5,textAlign:"center",lineHeight:1.3}}>
+                    ↩ REVERSE<br/>INTEGRATION
+                  </div>
+                  <div style={{fontSize:18,color:"#05966966"}}>↓</div>
+                </div>
               )}
-              {s.active && (
-                <div style={{position:"absolute",top:-8,right:-8,background:c,borderRadius:"50%",
-                  width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",
-                  fontSize:10,color:"#fff",fontWeight:700,animation:"pingDot 1.5s ease-in-out infinite"}}>▶</div>
-              )}
-              <div style={{fontSize:24,marginBottom:5}}>{s.icon}</div>
-              <div className={s.active?"dsp":""} style={{fontSize:9.5,textAlign:"center",
-                color:s.done?"#94A3B8":s.active?c:"#7A9CC4",
-                fontWeight:s.active?800:500,lineHeight:1.3}}>{s.label}</div>
             </div>
-            {i<JOURNEY.length-1 && (
-              <div style={{width:24,height:2,background:s.done?"#CBD5E1":"#D9E8F7",margin:"0 1px"}}/>
+            {/* Connector */}
+            {i<chain.length-1 && (
+              <div style={{display:"flex",alignItems:"center",flexShrink:0,paddingBottom:s.id==="mdm"?28:0}}>
+                <div style={{width:28,height:2.5,
+                  background:s.done?"linear-gradient(90deg,#10B981,#CBD5E1)":"#D9E8F7",
+                  borderRadius:2}}/>
+              </div>
             )}
-          </div>
+          </React.Fragment>
         );
       })}
     </div>
 
-    {/* Reverse Integration arc */}
-    <div style={{marginTop:14,display:"flex",flexDirection:"column",alignItems:"center",gap:0}}>
-      {/* Curved return line using SVG */}
-      <svg width="100%" height="44" style={{maxWidth:760,display:"block",overflow:"visible"}}>
+    {/* ── Reverse Integration arc (SVG + expand) ── */}
+    <div style={{margin:"4px 0 6px",display:"flex",flexDirection:"column",alignItems:"center"}}>
+      <svg width="100%" height="38" style={{overflow:"visible",maxWidth:640}}>
         <defs>
           <marker id="arrowRI" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
             <path d="M0,0 L0,6 L8,3 z" fill="#059669"/>
           </marker>
         </defs>
-        {/* Curved path from right (Publication/AI side) back to left (Source Systems) */}
-        <path d="M 88% 8 Q 50% 44 12% 8"
-          fill="none" stroke="#05966944" strokeWidth="2"
-          strokeDasharray="6 4" markerEnd="url(#arrowRI)"
-          style={{animation:"dashFlow 4s linear infinite"}}/>
-        <text x="50%" y="38" textAnchor="middle" fontSize="9.5" fontWeight="700"
-          fill="#059669" fontFamily="Plus Jakarta Sans,sans-serif">
-          ↩ Reverse Integration — Golden Record & Mastered Data written back to Source Systems
+        {/* Arc from under MDM (≈58% mark) back to Source Systems (≈6% mark) */}
+        <path d="M 62% 6 Q 34% 38 8% 6"
+          fill="none" stroke="#059669" strokeWidth="1.8"
+          strokeDasharray="6 5" opacity=".5" markerEnd="url(#arrowRI)"
+          style={{animation:"dashFlow 3.5s linear infinite"}}/>
+        <text x="34%" y="34" textAnchor="middle" fontSize="9" fontWeight="700"
+          fill="#059669" opacity=".85" fontFamily="Plus Jakarta Sans,sans-serif">
+          Golden Record &amp; Mastered Data written back to Source Systems
         </text>
       </svg>
 
-      {/* Expandable RI info */}
       <button onClick={()=>setShowRI(!showRI)}
         style={{background:showRI?"#ECFDF5":"#fff",border:`1.5px solid ${showRI?"#059669":"#A7F3D0"}`,
-          color:"#059669",borderRadius:20,padding:"4px 16px",fontSize:11,fontWeight:700,
-          cursor:"pointer",marginTop:2,transition:"all .2s"}}>
+          color:"#059669",borderRadius:20,padding:"4px 18px",fontSize:11,fontWeight:700,
+          cursor:"pointer",marginTop:0,transition:"all .2s"}}>
         {showRI?"▲ Hide":"▼ What is Reverse Integration?"}
       </button>
 
       {showRI && (
-        <div style={{marginTop:12,background:"#ECFDF5",border:"1.5px solid #A7F3D0",
-          borderRadius:16,padding:"16px 20px",maxWidth:680,width:"100%",
-          animation:"shimIn .25s ease"}}>
-          <div style={{fontFamily:"Bricolage Grotesque,sans-serif",fontWeight:800,
-            fontSize:14,color:"#059669",marginBottom:8}}>↩ Reverse Integration</div>
-          <div style={{fontSize:13,color:"#1A3050",lineHeight:1.85}}>
+        <div style={{marginTop:10,background:"#ECFDF5",border:"1.5px solid #A7F3D0",
+          borderRadius:16,padding:"18px 22px",width:"100%",animation:"shimIn .25s ease"}}>
+          <div className="dsp" style={{fontSize:14,fontWeight:800,color:"#059669",marginBottom:8}}>
+            ↩ Reverse Integration
+          </div>
+          <div style={{fontSize:13,color:"#1A3050",lineHeight:1.85,marginBottom:12}}>
             Data doesn't only flow forward. Once mastered, governed, and trusted — it flows <strong>back</strong> into the source systems that need it.
           </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(190px,1fr))",
-            gap:10,marginTop:12}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:10}}>
             {[
               {icon:"🏆",title:"Golden Record Writeback",desc:"MDM pushes the single trusted customer or product record back into CRM, ERP, and operational systems."},
-              {icon:"🏷️",title:"Enriched Attributes",desc:"Cleansed addresses, standardised names, validated DOBs — returned to the systems that originally had dirty data."},
-              {icon:"🔗",title:"Cross-Reference Sync",desc:"Xref tables keep source system IDs aligned — every system knows the same entity by its own local ID."},
-              {icon:"🤖",title:"AI-Driven Corrections",desc:"AI models detect anomalies and push corrections back upstream before bad data spreads further."},
+              {icon:"🏷️",title:"Enriched Attributes",    desc:"Cleansed addresses, standardised names, validated DOBs — returned to the systems that originally had dirty data."},
+              {icon:"🔗",title:"Cross-Reference Sync",   desc:"Xref tables keep source system IDs aligned — every system knows the same entity by its own local ID."},
+              {icon:"🤖",title:"AI-Driven Corrections",  desc:"AI models detect anomalies and push corrections back upstream before bad data spreads further."},
             ].map(r=>(
               <div key={r.title} style={{background:"#fff",borderRadius:12,padding:"12px 14px",
                 border:"1.5px solid #A7F3D0"}}>
@@ -1809,6 +1836,58 @@ const JMap = ({onClick}) => {
         </div>
       )}
     </div>
+
+    {/* ── Pervasive layers — Governance + AI-Native ── */}
+    <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:10}}>
+      {/* Governance — spans all */}
+      <div style={{background:"linear-gradient(90deg,#F5F3FF,#EDE9FE,#F5F3FF)",
+        border:"1.5px solid #DDD6FE",borderRadius:14,padding:"10px 18px",
+        display:"flex",alignItems:"center",gap:14}}>
+        <div style={{fontSize:22,flexShrink:0}}>⚖️</div>
+        <div style={{flex:1}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
+            <span className="dsp" style={{fontSize:13,fontWeight:800,color:"#6D28D9"}}>Data Governance</span>
+            <span style={{fontSize:9.5,color:"#7C3AED",background:"#EDE9FE",border:"1px solid #DDD6FE",
+              borderRadius:10,padding:"1px 8px",fontWeight:700,letterSpacing:.5}}>SPANS ALL STAGES</span>
+          </div>
+          <div style={{fontSize:11.5,color:"#5B21B6",lineHeight:1.5}}>
+            Ownership, policies, stewardship, and data quality standards operate across every stage — from ingestion to publication.
+          </div>
+        </div>
+        {/* Mini span indicator */}
+        <div style={{display:"flex",alignItems:"center",gap:3,flexShrink:0}}>
+          {["🗄️","⚙️","🔬","🏆","📡"].map((ic,i)=>(
+            <div key={i} style={{width:24,height:24,borderRadius:7,background:"rgba(109,40,217,.1)",
+              border:"1px solid #DDD6FE",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>
+              {ic}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* AI-Native — pervasive separate module */}
+      <div style={{background:"linear-gradient(90deg,#FDF4FF,#FAE8FF,#FDF4FF)",
+        border:"1.5px solid #E879F9",borderRadius:14,padding:"10px 18px",
+        display:"flex",alignItems:"center",gap:14,borderColor:"#F0ABFC"}}>
+        <div style={{fontSize:22,flexShrink:0}}>🤖</div>
+        <div style={{flex:1}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
+            <span className="dsp" style={{fontSize:13,fontWeight:800,color:"#C026D3"}}>AI-Native Data Management</span>
+            <span style={{fontSize:9.5,color:"#A21CAF",background:"#FAE8FF",border:"1px solid #F0ABFC",
+              borderRadius:10,padding:"1px 8px",fontWeight:700,letterSpacing:.5}}>SEPARATE MODULE</span>
+          </div>
+          <div style={{fontSize:11.5,color:"#86198F",lineHeight:1.5}}>
+            AI use cases, patterns, and implications across every domain — standalone capability <em>and</em> a handshake with everything you've learned.
+          </div>
+        </div>
+        <div style={{flexShrink:0,background:"rgba(192,38,211,.1)",border:"1.5px solid #F0ABFC",
+          borderRadius:12,padding:"6px 14px",fontSize:11,fontWeight:700,color:"#C026D3",
+          whiteSpace:"nowrap"}}>
+          🔀 Standalone + Handshake
+        </div>
+      </div>
+    </div>
+
   </div>
   );
 };
@@ -1971,7 +2050,7 @@ const App = () => {
       <nav style={{position:"sticky",top:0,zIndex:100,
         background:"rgba(242,247,255,.93)",borderBottom:"1.5px solid #D9E8F7",
         backdropFilter:"blur(14px)",padding:"0 24px"}}>
-        <div style={{maxWidth:1100,margin:"0 auto",display:"flex",alignItems:"center",
+        <div style={{maxWidth:1260,margin:"0 auto",display:"flex",alignItems:"center",
           justifyContent:"space-between",height:66}}>
           <div style={{display:"flex",alignItems:"center",gap:12}}>
             <img src={AVATAR} alt="Raja" style={{width:38,height:38,borderRadius:"50%",
@@ -2059,7 +2138,7 @@ const App = () => {
       </div>
 
       {/* CONTENT */}
-      <div style={{padding:"0 24px 80px",maxWidth:1100,margin:"0 auto",position:"relative",zIndex:1}}>
+      <div style={{padding:"0 24px 80px",maxWidth:1260,margin:"0 auto",position:"relative",zIndex:1}}>
         <JMap onClick={jump}/>
         <div style={{display:"flex",gap:8,marginBottom:22,flexWrap:"wrap"}}>
           {tabs.map(t=>(
