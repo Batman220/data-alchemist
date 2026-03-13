@@ -61,24 +61,21 @@ const AVATAR   = window.__AVATAR__;
 const LINKEDIN = window.__LINKEDIN__;
 
 // ── LOGIN TRACKER ─────────────────────────────────────────────────────────
-// Paste your Google Apps Script Web App URL below after deploying
-// Leave as empty string "" to disable tracking silently
 const TRACKER_URL = "https://script.google.com/macros/s/AKfycbz5EfcUxWP6v10nBtSyJwqHKRNPD6-1qbEhhqkbZC5QJ_7UlLTRMUZjTP_D9MajwwsW/exec";
 
 async function trackLogin(name, email, org, keyHint) {
-  if (!TRACKER_URL) return; // tracking disabled if URL not set
+  if (!TRACKER_URL) return;
   try {
     const sessionId = "sess_" + Math.random().toString(36).slice(2, 10) + "_" + Date.now();
     const browser   = navigator.userAgent.match(/(Chrome|Firefox|Safari|Edge)[\/\s]([\d.]+)/)?.[0] || navigator.userAgent.slice(0,40);
     const timezone  = Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown";
     await fetch(TRACKER_URL, {
       method: "POST",
-      mode: "no-cors", // avoids CORS issues with Apps Script
+      mode: "no-cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, org, sessionId, browser, timezone, keyHint }),
     });
   } catch (err) {
-    // fail silently — never block the student login
     console.warn("Tracker:", err.message);
   }
 }
@@ -86,18 +83,14 @@ async function trackLogin(name, email, org, keyHint) {
 // ── SESSION PERSISTENCE (localStorage + Google Sheets cloud sync) ─────────
 const LS = {
   key: (email) => `alch__${(email||"guest").replace(/[^a-z0-9]/gi,"_").toLowerCase()}`,
-
-  // Local read/write (instant)
   load:  (email) => { try { return JSON.parse(localStorage.getItem(LS.key(email)) || "{}"); } catch { return {}; } },
   save:  (email, data) => { try { localStorage.setItem(LS.key(email), JSON.stringify(data)); } catch {} },
   patch: (email, updater) => {
     const d = LS.load(email);
     const next = updater(d);
     LS.save(email, next);
-    if (email) LS.pushCloud(email, next); // fire-and-forget cloud sync
+    if (email) LS.pushCloud(email, next);
   },
-
-  // Cloud push — save session to Google Sheets (async, silent)
   pushCloud: async (email, data) => {
     if (!TRACKER_URL || !email) return;
     try {
@@ -111,10 +104,8 @@ const LS = {
           sessionData: { chatHistory: chatHistory||{}, topicCache: topicCache||{} },
         }),
       });
-    } catch { /* fail silently */ }
+    } catch { }
   },
-
-  // Cloud pull — fetch session from Sheets on login, merge into localStorage
   pullCloud: async (email) => {
     if (!TRACKER_URL || !email) return { found: false };
     try {
@@ -323,8 +314,6 @@ const DataBg = () => {
   return (
     <div style={{position:"fixed",inset:0,zIndex:0,overflow:"hidden",pointerEvents:"none",
       background:"linear-gradient(135deg,#040C1E 0%,#080F25 35%,#0C0A22 65%,#050C1A 100%)"}}>
-
-      {/* Vivid radial glows — one per module */}
       {glows.map((g,i)=>(
         <div key={i} style={{position:"absolute",left:`${g.x}%`,top:`${g.y}%`,
           width:g.r,height:g.r,borderRadius:"50%",
@@ -332,13 +321,9 @@ const DataBg = () => {
           transform:"translate(-50%,-50%)",filter:"blur(2px)",
           animation:`orbPulse ${7+i*1.3}s ease-in-out ${i*.55}s infinite`}}/>
       ))}
-
-      {/* Dot grid */}
       <div style={{position:"absolute",inset:0,
         backgroundImage:"radial-gradient(circle,rgba(148,163,184,.08) 1px,transparent 1px)",
         backgroundSize:"44px 44px"}}/>
-
-      {/* SVG: connection lines + node rings + star field */}
       <svg style={{position:"absolute",inset:0,width:"100%",height:"100%"}}>
         <defs>
           <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1">
@@ -351,14 +336,12 @@ const DataBg = () => {
           </linearGradient>
           <filter id="ng"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
-        {/* Animated dashed connection lines */}
         {lines.map(([x1,y1,x2,y2],i)=>(
           <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
             stroke={i%2===0?"url(#lg1)":"url(#lg2)"}
             strokeWidth={i%3===0?"1.5":"1"} strokeDasharray="6 11" opacity=".5"
             style={{animation:`dashFlow ${11+i*1.8}s linear ${i*.25}s infinite`}}/>
         ))}
-        {/* Glowing node rings */}
         {nodeData.map(([cx,cy,col],i)=>(
           <g key={i} filter="url(#ng)">
             <circle cx={cx} cy={cy} r="8" fill="none" stroke={col} strokeWidth="1" opacity=".3"
@@ -368,24 +351,18 @@ const DataBg = () => {
             <circle cx={cx} cy={cy} r="2" fill={col} opacity="1"/>
           </g>
         ))}
-        {/* Star field */}
         {stars.map((s,i)=>(
           <circle key={i} cx={`${s.x}%`} cy={`${s.y}%`} r={s.s}
             fill="rgba(255,255,255,.4)"
             style={{animation:`nodePulse ${2.5+s.d}s ease-in-out ${s.d}s infinite`}}/>
         ))}
-        {/* Large faint orbit rings */}
         <ellipse cx="50%" cy="50%" rx="42%" ry="44%" fill="none"
-          stroke="rgba(139,92,246,.05)" strokeWidth="1"
-          strokeDasharray="8 20"
+          stroke="rgba(139,92,246,.05)" strokeWidth="1" strokeDasharray="8 20"
           style={{animation:"orbit 120s linear infinite",transformOrigin:"50% 50%"}}/>
         <ellipse cx="50%" cy="50%" rx="30%" ry="32%" fill="none"
-          stroke="rgba(34,211,238,.04)" strokeWidth="1"
-          strokeDasharray="6 16"
+          stroke="rgba(34,211,238,.04)" strokeWidth="1" strokeDasharray="6 16"
           style={{animation:"orbit 80s linear reverse infinite",transformOrigin:"50% 50%"}}/>
       </svg>
-
-      {/* Floating module cards */}
       {cards.map((c,i)=>(
         <div key={i} style={{position:"absolute",left:`${c.x}%`,top:`${c.y}%`,
           background:"rgba(4,12,30,.65)",
@@ -398,7 +375,6 @@ const DataBg = () => {
             <div style={{fontSize:10,fontWeight:800,color:c.color,letterSpacing:.8,
               fontFamily:"Bricolage Grotesque,sans-serif",whiteSpace:"nowrap"}}>{c.label.toUpperCase()}</div>
           </div>
-          {/* Subtle glow underline */}
           <div style={{height:1.5,marginTop:5,borderRadius:4,
             background:`linear-gradient(90deg,transparent,${c.color}55,transparent)`}}/>
         </div>
@@ -407,7 +383,7 @@ const DataBg = () => {
   );
 };
 
-// ─── APP BACKGROUND (light — used inside the main dashboard) ─────────────
+// ─── APP BACKGROUND ──────────────────────────────────────────────────────
 const AppBg = () => {
   const pills = [
     {x:3,  y:9,  label:"SS",      sub:"Source Systems", c:"#059669", a:"floatA 7s ease-in-out infinite 0s"},
@@ -458,7 +434,6 @@ const AppBg = () => {
 
 // ─── ROTATING QUOTES ─────────────────────────────────────────────────────
 const QUOTES = [
-  // ── Classic Data ──────────────────────────────────────────────────────
   { q:"Without data, you're just another person with an opinion.", a:"W. Edwards Deming", cat:"data" },
   { q:"In God we trust. All others must bring data.", a:"W. Edwards Deming", cat:"data" },
   { q:"The goal is to turn data into information, and information into insight.", a:"Carly Fiorina, Former CEO, HP", cat:"data" },
@@ -468,7 +443,6 @@ const QUOTES = [
   { q:"The price of light is less than the cost of darkness.", a:"Arthur C. Nielsen, Market Researcher", cat:"data" },
   { q:"Data are becoming the new raw material of business.", a:"Craig Mundie, Microsoft", cat:"data" },
   { q:"Errors using inadequate data are much less than those using no data at all.", a:"Charles Babbage, Mathematician", cat:"data" },
-  // ── AI ────────────────────────────────────────────────────────────────
   { q:"AI is probably the most important thing humanity has ever worked on. I think of it as something more profound than electricity or fire.", a:"Sundar Pichai, CEO, Google", cat:"ai" },
   { q:"Artificial intelligence is the new electricity.", a:"Andrew Ng, AI Pioneer", cat:"ai" },
   { q:"We are at a point where AI is able to perform tasks that, until recently, only humans could do.", a:"Fei-Fei Li, Stanford AI Lab", cat:"ai" },
@@ -476,7 +450,6 @@ const QUOTES = [
   { q:"Machine intelligence is the last invention that humanity will ever need to make.", a:"Nick Bostrom, Oxford University", cat:"ai" },
   { q:"AI will be the greatest opportunity for value creation in the history of business.", a:"Jensen Huang, CEO, NVIDIA", cat:"ai" },
   { q:"The question is not whether machines can think. The question is whether we can govern the data they think with.", a:"Kai-Fu Lee, AI Investor & Author", cat:"ai" },
-  // ── Poor Data Kills AI ────────────────────────────────────────────────
   { q:"Garbage in, garbage out. With AI, it's more like: garbage in, confidently wrong output at scale.", a:"Thomas C. Redman, 'Data Doctor'", cat:"dq-ai" },
   { q:"Eighty percent of the work in any data project is just getting the data to the point where you can use it.", a:"DJ Patil, Former US Chief Data Scientist", cat:"dq-ai" },
   { q:"An AI model is only as trustworthy as the data it was trained on. Bad data doesn't just hurt performance — it encodes bias permanently.", a:"Kate Crawford, AI Now Institute", cat:"dq-ai" },
@@ -544,12 +517,10 @@ const Lock = ({onUnlock}) => {
       if (r.ok) {
         const keyHint  = "…" + key.trim().slice(-6);
         const em       = email.trim();
-        // Stamp name/org into localStorage so pushCloud can include them
         if (em) LS.patch(em, d => ({ ...d, _name: name.trim(), _org: org.trim() }));
-        // Pull cloud session first — restores cross-device history before app loads
         if (em) {
           setSyncing(true);
-          await LS.pullCloud(em); // merges Sheets → localStorage silently
+          await LS.pullCloud(em);
           setSyncing(false);
         }
         trackLogin(name.trim(), em, org.trim(), keyHint);
@@ -571,18 +542,15 @@ const Lock = ({onUnlock}) => {
         boxShadow:"0 0 0 1px rgba(139,92,246,.12), 0 40px 100px rgba(0,0,0,.7), 0 0 60px rgba(139,92,246,.06), inset 0 1px 0 rgba(255,255,255,.07)",
         backdropFilter:"blur(28px)",position:"relative",zIndex:1,overflow:"hidden"}}>
 
-        {/* Rainbow top bar */}
         <div style={{position:"absolute",top:0,left:0,right:0,height:3,borderRadius:"32px 32px 0 0",
           background:"linear-gradient(90deg,#34D399 0%,#22D3EE 18%,#60A5FA 35%,#A78BFA 52%,#F472B6 68%,#FBBF24 84%,#34D399 100%)",
           opacity:.9}}/>
 
-        {/* Subtle inner corner glow */}
         <div style={{position:"absolute",top:-60,right:-60,width:220,height:220,borderRadius:"50%",
           background:"radial-gradient(circle,rgba(139,92,246,.12) 0%,transparent 70%)",pointerEvents:"none"}}/>
         <div style={{position:"absolute",bottom:-80,left:-60,width:260,height:260,borderRadius:"50%",
           background:"radial-gradient(circle,rgba(34,211,238,.08) 0%,transparent 70%)",pointerEvents:"none"}}/>
 
-        {/* Raja branding */}
         <div style={{background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.07)",
           borderRadius:20,padding:"18px 20px",marginBottom:28,display:"flex",alignItems:"center",gap:16,
           backdropFilter:"blur(8px)",boxShadow:"inset 0 1px 0 rgba(255,255,255,.05)"}}>
@@ -617,7 +585,6 @@ const Lock = ({onUnlock}) => {
           </div>
         </div>
 
-        {/* Title + subtitle */}
         <div style={{textAlign:"center",marginBottom:26}}>
           <h1 className="dsp" style={{fontSize:"2.7rem",fontWeight:800,color:"#EFF6FF",
             letterSpacing:"-1.5px",lineHeight:1.05,marginBottom:8}}>
@@ -631,8 +598,6 @@ const Lock = ({onUnlock}) => {
           <div style={{fontSize:9.5,letterSpacing:3,color:"rgba(255,255,255,.28)",fontWeight:700,marginBottom:22}}>
             SOURCE SYSTEMS · ETL/ELT · DATA QUALITY · MDM · PUBLICATION · GOVERNANCE
           </div>
-
-          {/* Animated module journey strip */}
           <style>{`
             @keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
             @keyframes tileGlow{0%,100%{box-shadow:0 0 10px var(--tc,#60A5FA)20,inset 0 1px 0 rgba(255,255,255,.05)}50%{box-shadow:0 0 22px var(--tc,#60A5FA)40,0 0 40px var(--tc,#60A5FA)15,inset 0 1px 0 rgba(255,255,255,.08)}}
@@ -674,7 +639,6 @@ const Lock = ({onUnlock}) => {
           </div>
         </div>
 
-        {/* Form */}
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:13,marginBottom:18}}>
           <div>
             <label style={{fontSize:11,color:"rgba(255,255,255,.38)",display:"block",marginBottom:6,
@@ -764,17 +728,16 @@ const ChatModal = ({apiKey, mod, mode, onClose, userEmail}) => {
   const cf = cfgs[mode] || cfgs.tutor;
   const c  = mod.hex;
 
-  // Persist chat history whenever msgs changes
   useEffect(()=>{
     if (msgs.length === 0) return;
     LS.patch(userEmail, d => ({
       ...d,
-      chatHistory: { ...(d.chatHistory||{}), [histKey]: msgs.slice(-60) } // keep last 60 msgs
+      chatHistory: { ...(d.chatHistory||{}), [histKey]: msgs.slice(-60) }
     }));
   }, [msgs]);
 
   useEffect(()=>{
-    if (initMsgs.length > 0) return; // restored — don't re-kick
+    if (initMsgs.length > 0) return;
     if (cf.starter) setMsgs([{role:"assistant",content:cf.starter,id:Date.now()}]);
     else kick();
   },[]);
@@ -1033,10 +996,8 @@ const ProbeSession = ({apiKey, onClose}) => {
   );
 };
 
-// ─── MODULE CARD ──────────────────────────────────────────────────────────
 // ─── INTERACTIVE DIAGRAMS ─────────────────────────────────────────────────
 
-// DQ: 6 Dimensions Wheel
 const DQWheel = ({hex}) => {
   const [sel,setSel] = React.useState(null);
   const dims = [
@@ -1121,7 +1082,6 @@ const DQWheel = ({hex}) => {
   );
 };
 
-// ETL/ELT: Interactive Pipeline Flow
 const ETLFlow = ({hex}) => {
   const [sel,setSel] = React.useState(null);
   const [mode,setMode] = React.useState("etl");
@@ -1204,13 +1164,8 @@ const ETLFlow = ({hex}) => {
   );
 };
 
-// // Code Signature: Raja Shahnawaz Soni
-
 const MDMDiagram = ({hex}) => {
   React.useEffect(() => {
-    /* ══════════════════════════════════════════
-       ATTACH GLOBALS FOR INLINE HTML CLICKS
-    ══════════════════════════════════════════ */
     window.showPanel = function(id, el) {
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -1553,11 +1508,9 @@ const MDMDiagram = ({hex}) => {
       document.getElementById('trust-note').innerHTML = `<strong>How survivorship works:</strong> The MDM engine applies trust rules field-by-field. The most trusted source for each field wins. If trust is equal, recency or completeness breaks the tie.`;
     };
 
-    // INIT
     window.renderTree();
     window.buildTrustUI();
 
-    // CLEANUP GLOBALS ON UNMOUNT
     return () => {
       delete window.showPanel; delete window.loadHier; delete window.renderTree;
       delete window.renderRelationships; delete window.selectNode; delete window.buildTrustUI;
@@ -1875,17 +1828,15 @@ const DiagramPanel = ({id, hex, light}) => {
 const ModCard = ({apiKey, mod, onChat, userEmail}) => {
   const [open,setOpen]   = useState(false);
   const [topic,setTopic] = useState(null);
-  const [depth,setDepth] = useState("quick"); // "quick" | "deep"
+  const [depth,setDepth] = useState("quick");
   const [ltopic,setLtopic] = useState(null);
   const c = mod.hex;
 
-  // Load topic cache from localStorage on mount
   const [tdata,setTdata] = useState(()=>{
     const stored = LS.load(userEmail);
     return stored.topicCache?.[mod.id] || {};
   });
 
-  // Save topic cache whenever it changes
   useEffect(()=>{
     if (Object.keys(tdata).length === 0) return;
     LS.patch(userEmail, d => ({
@@ -2070,10 +2021,8 @@ Be thorough but sharp — no filler, no waffle.`;
   );
 };
 
-// ─── JOURNEY MAP ──────────────────────────────────────────────────────────
 const JMap = ({onClick}) => {
   const [showRI, setShowRI] = React.useState(false);
-  // Main pipeline — 5 nodes only (DG and AI are pervasive layers, not chain nodes)
   const chain = [
     {id:"ss",  label:"Source Systems", icon:"🗄️", done:true},
     {id:"etl", label:"Integration",    icon:"⚙️",  done:true},
@@ -2094,7 +2043,6 @@ const JMap = ({onClick}) => {
       THE DATA MANAGEMENT JOURNEY · 5-STAGE PIPELINE + REVERSE INTEGRATION
     </div>
 
-    {/* ── Main pipeline row ── */}
     <div style={{display:"flex",alignItems:"stretch",justifyContent:"center",gap:0}}>
       {chain.map((s,i)=>{
         const {mod,c} = nodeStyle(s);
@@ -2124,7 +2072,6 @@ const JMap = ({onClick}) => {
                   fontWeight:s.active?800:500,lineHeight:1.3}}>{s.label}</div>
               </div>
 
-              {/* Reverse Integration return arrow — shows BELOW MDM only */}
               {s.id==="mdm" && (
                 <div style={{marginTop:8,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
                   <div style={{fontSize:9,color:"#059669",fontWeight:700,letterSpacing:.5,textAlign:"center",lineHeight:1.3}}>
@@ -2134,7 +2081,6 @@ const JMap = ({onClick}) => {
                 </div>
               )}
             </div>
-            {/* Connector */}
             {i<chain.length-1 && (
               <div style={{display:"flex",alignItems:"center",flexShrink:0,paddingBottom:s.id==="mdm"?28:0}}>
                 <div style={{width:28,height:2.5,
@@ -2147,7 +2093,6 @@ const JMap = ({onClick}) => {
       })}
     </div>
 
-    {/* ── Reverse Integration arc (SVG + expand) ── */}
     <div style={{margin:"4px 0 6px",display:"flex",flexDirection:"column",alignItems:"center"}}>
       <svg width="100%" height="38" style={{overflow:"visible",maxWidth:640}}>
         <defs>
@@ -2155,7 +2100,6 @@ const JMap = ({onClick}) => {
             <path d="M0,0 L0,6 L8,3 z" fill="#059669"/>
           </marker>
         </defs>
-        {/* Arc from under MDM (≈58% mark) back to Source Systems (≈6% mark) */}
         <path d="M 62% 6 Q 34% 38 8% 6"
           fill="none" stroke="#059669" strokeWidth="1.8"
           strokeDasharray="6 5" opacity=".5" markerEnd="url(#arrowRI)"
@@ -2201,9 +2145,7 @@ const JMap = ({onClick}) => {
       )}
     </div>
 
-    {/* ── Pervasive layers — Governance + AI-Native ── */}
     <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:10}}>
-      {/* Governance — spans all */}
       <div style={{background:"linear-gradient(90deg,#F5F3FF,#EDE9FE,#F5F3FF)",
         border:"1.5px solid #DDD6FE",borderRadius:14,padding:"10px 18px",
         display:"flex",alignItems:"center",gap:14}}>
@@ -2218,7 +2160,6 @@ const JMap = ({onClick}) => {
             Ownership, policies, stewardship, and data quality standards operate across every stage — from ingestion to publication.
           </div>
         </div>
-        {/* Mini span indicator */}
         <div style={{display:"flex",alignItems:"center",gap:3,flexShrink:0}}>
           {["🗄️","⚙️","🔬","🏆","📡"].map((ic,i)=>(
             <div key={i} style={{width:24,height:24,borderRadius:7,background:"rgba(109,40,217,.1)",
@@ -2229,7 +2170,6 @@ const JMap = ({onClick}) => {
         </div>
       </div>
 
-      {/* AI-Native — pervasive separate module */}
       <div style={{background:"linear-gradient(90deg,#FDF4FF,#FAE8FF,#FDF4FF)",
         border:"1.5px solid #E879F9",borderRadius:14,padding:"10px 18px",
         display:"flex",alignItems:"center",gap:14,borderColor:"#F0ABFC"}}>
@@ -2256,7 +2196,6 @@ const JMap = ({onClick}) => {
   );
 };
 
-// ─── SCHEDULE ─────────────────────────────────────────────────────────────
 const Schedule = () => {
   const days = [
     {day:"Sunday",   dur:"2–3 hrs", type:"Deep Dive",       c:"#0284C7",l:"#E0F2FE", desc:"New module intro · Wayground/Miro · Group challenge · Analogy battle"},
@@ -2306,7 +2245,6 @@ const Schedule = () => {
   );
 };
 
-// ─── METHODS ──────────────────────────────────────────────────────────────
 const Methods = ({onProbe}) => {
   const list = [
     {i:"🗺️",n:"Wayground",          d:"Collaborative visual journey maps — trace data flows, lineage, hierarchies in real-time."},
@@ -2339,7 +2277,6 @@ const Methods = ({onProbe}) => {
   );
 };
 
-// ─── QUICK ASK ────────────────────────────────────────────────────────────
 const QAsk = ({apiKey}) => {
   const [open,setOpen]     = useState(false);
   const [q,setQ]           = useState("");
@@ -2388,7 +2325,6 @@ const QAsk = ({apiKey}) => {
   );
 };
 
-// ─── MAIN APP ─────────────────────────────────────────────────────────────
 const App = () => {
   const [key,setKey]     = useState("");
   const [uname,setUname] = useState("");
@@ -2410,7 +2346,6 @@ const App = () => {
     <div style={{minHeight:"100vh",background:"var(--bg)",position:"relative"}}>
       <AppBg/>
 
-      {/* NAV */}
       <nav style={{position:"sticky",top:0,zIndex:100,
         background:"rgba(242,247,255,.93)",borderBottom:"1.5px solid #D9E8F7",
         backdropFilter:"blur(14px)",padding:"0 24px"}}>
@@ -2448,7 +2383,6 @@ const App = () => {
         </div>
       </nav>
 
-      {/* HERO */}
       <div style={{textAlign:"center",padding:"52px 24px 36px",position:"relative",zIndex:1}}>
         <div className="fu" style={{display:"inline-flex",alignItems:"center",gap:10,
           background:"rgba(255,255,255,.92)",border:"1.5px solid #D9E8F7",borderRadius:50,
@@ -2501,7 +2435,6 @@ const App = () => {
         </div>
       </div>
 
-      {/* CONTENT */}
       <div style={{padding:"0 24px 80px",maxWidth:1260,margin:"0 auto",position:"relative",zIndex:1}}>
         <JMap onClick={jump}/>
         <div style={{display:"flex",gap:8,marginBottom:22,flexWrap:"wrap"}}>
@@ -2529,7 +2462,6 @@ const App = () => {
         {tab==="methods"  && <Methods onProbe={()=>setProbe(true)}/>}
       </div>
 
-      {/* SOCRATIC BANNER */}
       <div style={{background:"linear-gradient(135deg,#FFFBEB,#FEF3C7)",borderTop:"1.5px solid #FDE68A",padding:"22px 24px",position:"relative",zIndex:1}}>
         <div style={{maxWidth:1100,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:16}}>
           <div style={{display:"flex",alignItems:"center",gap:14}}>
@@ -2547,7 +2479,6 @@ const App = () => {
         </div>
       </div>
 
-      {/* FOOTER */}
       <footer style={{textAlign:"center",padding:"22px 24px",borderTop:"1.5px solid #D9E8F7",
         background:"rgba(255,255,255,.88)",fontSize:12,color:"#7A9CC4",
         position:"relative",zIndex:1}}>
