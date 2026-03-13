@@ -80,7 +80,7 @@ async function trackLogin(name, email, org, keyHint) {
   }
 }
 
-// ── SESSION PERSISTENCE (localStorage + Google Sheets cloud sync) ─────────
+// ── SESSION PERSISTENCE ───────────────────────────────────────────────────
 const LS = {
   key: (email) => `alch__${(email||"guest").replace(/[^a-z0-9]/gi,"_").toLowerCase()}`,
   load:  (email) => { try { return JSON.parse(localStorage.getItem(LS.key(email)) || "{}"); } catch { return {}; } },
@@ -1537,20 +1537,86 @@ const MDMDiagram = ({hex}) => {
       document.getElementById('trust-note').innerHTML = `<strong>How survivorship works:</strong> The MDM engine applies trust rules field-by-field.`;
     };
 
+    // --- Multi-Domain Graph Logic ---
     window.toggleMDMMode = function(mode, el) {
       document.querySelectorAll('.mdm-mode-btn').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
       if(mode === 'single') {
         document.getElementById('mdm-single').style.display = 'grid';
         document.getElementById('mdm-multi').style.display = 'none';
-        document.getElementById('mdm-q-result').innerHTML = `❌ <span style="color:#BE123C">Cannot Answer. Data is siloed. Systems don't talk to each other.</span>`;
-        document.getElementById('mdm-q-result').className = "mdm-res-box error";
+        window.resetGraphScenario();
       } else {
         document.getElementById('mdm-single').style.display = 'none';
         document.getElementById('mdm-multi').style.display = 'block';
-        document.getElementById('mdm-q-result').innerHTML = `✅ <span style="color:#059669">Tariq Mansour</span> <span style="color:#64748b;font-weight:500;font-size:12px">(Graph relationships queried across 3 domains instantly)</span>`;
-        document.getElementById('mdm-q-result').className = "mdm-res-box success";
       }
+    };
+
+    window.scenarioRunning = false;
+    window.scenarioDone = false;
+
+    window.handleScenarioBtn = function() {
+      if(window.scenarioRunning) return;
+      if(window.scenarioDone) {
+        window.resetGraphScenario();
+      } else {
+        window.runGraphScenario();
+      }
+    };
+
+    window.runGraphScenario = function() {
+      window.scenarioRunning = true;
+      const btn = document.getElementById('btn-run-scenario');
+      btn.innerHTML = "⏳ Querying Enterprise Graph...";
+      btn.style.opacity = '0.7';
+
+      // Step 1: Customer -> Location
+      setTimeout(() => {
+        document.getElementById('svg-line-cl').classList.add('active');
+        document.getElementById('gn-loc').classList.add('glow-loc');
+        document.getElementById('lbl-cl').style.opacity = '1';
+      }, 600);
+
+      // Step 2: Customer -> Product
+      setTimeout(() => {
+        document.getElementById('svg-line-cp').classList.add('active');
+        document.getElementById('gn-prod').classList.add('glow-prod');
+        document.getElementById('lbl-cp').style.opacity = '1';
+      }, 1600);
+
+      // Step 3: Location -> Product
+      setTimeout(() => {
+        document.getElementById('svg-line-lp').classList.add('active');
+        document.getElementById('lbl-lp').style.opacity = '1';
+      }, 2600);
+
+      // Step 4: Insight Overlay
+      setTimeout(() => {
+        document.getElementById('mdm-insight').style.opacity = '1';
+        document.getElementById('mdm-insight').style.transform = 'translateY(0) scale(1)';
+        btn.innerHTML = "↺ Reset Scenario";
+        btn.style.opacity = '1';
+        window.scenarioRunning = false;
+        window.scenarioDone = true;
+      }, 3800);
+    };
+
+    window.resetGraphScenario = function() {
+      window.scenarioDone = false;
+      document.getElementById('btn-run-scenario').innerHTML = "▶ Run Retention Scenario";
+      
+      document.getElementById('svg-line-cl').classList.remove('active');
+      document.getElementById('svg-line-cp').classList.remove('active');
+      document.getElementById('svg-line-lp').classList.remove('active');
+      
+      document.getElementById('gn-loc').classList.remove('glow-loc');
+      document.getElementById('gn-prod').classList.remove('glow-prod');
+
+      document.getElementById('lbl-cl').style.opacity = '0';
+      document.getElementById('lbl-cp').style.opacity = '0';
+      document.getElementById('lbl-lp').style.opacity = '0';
+
+      document.getElementById('mdm-insight').style.opacity = '0';
+      document.getElementById('mdm-insight').style.transform = 'translateY(20px) scale(0.95)';
     };
 
     window.runKeyAnim = function(type) {
@@ -1606,8 +1672,10 @@ const MDMDiagram = ({hex}) => {
       delete window.showPanel; delete window.loadHier; delete window.renderTree;
       delete window.renderRelationships; delete window.selectNode; delete window.buildTrustUI;
       delete window.runTrustAnimation; delete window.resetTrust; delete window.toggleMDMMode;
+      delete window.runGraphScenario; delete window.resetGraphScenario; delete window.handleScenarioBtn;
       delete window.runKeyAnim; delete window.resetKeyAnim; delete window.HIER_DATA;
       delete window.TRUST_SOURCES; delete window.GOLDEN_FIELDS; delete window.animRunning;
+      delete window.scenarioRunning; delete window.scenarioDone;
       delete window.currentHier;
     };
   }, []);
@@ -1660,20 +1728,38 @@ const MDMDiagram = ({hex}) => {
         .mdm-mode-tabs {display:inline-flex; background:#e2e8f0; border-radius:30px; padding:4px; margin-bottom:24px;}
         .mdm-mode-btn {background:transparent; border:none; border-radius:24px; padding:8px 20px; font-size:13px; font-weight:700; color:#64748b; cursor:pointer; transition:all .2s;}
         .mdm-mode-btn.active {background:#7C3AED; color:#fff; box-shadow:0 4px 12px rgba(124,58,237,.3);}
+        
+        /* NEW DARK GRAPH CSS */
         .silo-grid {display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; margin-bottom:24px;}
         @media(max-width:700px){.silo-grid {grid-template-columns:1fr;}}
         .md-silo {background:#fff; border:2px solid #e2e8f0; border-radius:16px; padding:20px; text-align:center; position:relative;}
         .md-silo-title {font-size:11px; font-weight:800; letter-spacing:1px; margin-bottom:12px;}
         .md-silo-data {background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px; font-size:12px; font-weight:600; color:#334155; display:flex; flex-direction:column; gap:4px; align-items:center;}
         .md-silo-data span {font-size:24px; margin-bottom:4px;}
+        
         .mdm-q-box {background:#fff; border:1.5px solid #e2e8f0; border-radius:16px; padding:24px; text-align:center;}
         .mdm-q-text {font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:700; color:#1e293b; margin-bottom:16px;}
-        .mdm-res-box {padding:12px 20px; border-radius:12px; font-size:15px; font-weight:700; display:inline-flex; align-items:center; gap:10px; margin:0 auto;}
-        .mdm-res-box.error {background:#FFF1F2; border:1.5px solid #FECDD3;}
-        .mdm-res-box.success {background:#ECFDF5; border:1.5px solid #A7F3D0;}
-        .multi-graph-box {background:#fff; border:2px solid #DDD6FE; border-radius:16px; padding:40px 20px; position:relative; overflow:hidden;}
-        .graph-node {position:absolute; background:#fff; border:2px solid; border-radius:12px; padding:10px 16px; font-size:12px; font-weight:700; display:flex; align-items:center; gap:8px; z-index:2; box-shadow:0 4px 12px rgba(0,0,0,.05);}
-        .graph-line {position:absolute; border-top:2px dashed #94a3b8; z-index:1; animation:dashFlow 4s linear infinite;}
+        
+        .multi-graph-stage {background:#0f172a; border-radius:20px; height:380px; position:relative; overflow:hidden; margin-bottom:24px; border:1px solid #334155; box-shadow:inset 0 0 60px rgba(0,0,0,.5)}
+        .graph-svg-layer {position:absolute; inset:0; width:100%; height:100%; z-index:1;}
+        .svg-path {fill:none; stroke:#334155; stroke-width:3; stroke-dasharray:6 8;}
+        .svg-path.active {stroke:var(--pc); animation:streamData 1s linear infinite; filter:drop-shadow(0 0 6px var(--pc))}
+        @keyframes streamData { to { stroke-dashoffset: -14; } }
+        
+        .g-node {position:absolute; background:rgba(30,41,59,.8); border:2px solid; border-radius:14px; padding:12px 18px; color:#fff; font-size:13px; font-weight:700; display:flex; flex-direction:column; align-items:center; gap:4px; z-index:2; backdrop-filter:blur(8px); transition:all .4s; box-shadow:0 8px 32px rgba(0,0,0,.4)}
+        .g-node span {font-size:10px; color:#94a3b8; font-weight:600; letter-spacing:1px; text-transform:uppercase}
+        .g-node.glow-loc {box-shadow:0 0 30px rgba(217,119,6,.4); border-color:#D97706; transform:scale(1.05)}
+        .g-node.glow-prod {box-shadow:0 0 30px rgba(5,150,105,.4); border-color:#059669; transform:scale(1.05)}
+        
+        .g-label {position:absolute; background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:4px 10px; border-radius:20px; font-size:10px; font-weight:700; z-index:3; opacity:0; transition:opacity .4s ease; text-align:center;}
+        .g-label span {display:block; color:#fff;}
+
+        .insight-overlay {position:absolute; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px) scale(0.95); width:90%; max-width:600px; background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border-radius:16px; padding:20px; z-index:10; border:2px solid #10B981; box-shadow:0 20px 50px rgba(0,0,0,.5); opacity:0; transition:all .5s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events:none;}
+        .insight-overlay h4 {margin:0 0 8px 0; color:#065F46; font-size:15px; display:flex; align-items:center; gap:8px;}
+        .insight-overlay p {margin:0; font-size:13px; color:#334155; line-height:1.6;}
+        
+        .btn-scenario {background:linear-gradient(135deg,#2563EB,#7C3AED); color:#fff; border:none; border-radius:12px; padding:12px 24px; font-size:14px; font-weight:700; cursor:pointer; display:block; margin:0 auto; transition:all .2s; box-shadow:0 4px 16px rgba(37,99,235,.3)}
+        .btn-scenario:hover {transform:translateY(-2px); box-shadow:0 6px 20px rgba(37,99,235,.4)}
 
         .trust-layout{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:start}
         @media(max-width:800px){.trust-layout{grid-template-columns:1fr;gap:20px}}
@@ -1777,28 +1863,59 @@ const MDMDiagram = ({hex}) => {
               <div class="md-silo-title" style="color:#D97706">LOCATION DOMAIN</div>
               <div class="md-silo-data"><span>🏪</span> Grand Plaza Mall<br/><span style="font-size:10px;color:#94a3b8">DXB-GPM-001</span></div>
             </div>
-          </div>
-
-          <div class="multi-graph-box" id="mdm-multi" style="display:none; height:220px; margin-bottom:24px;">
-            <div class="graph-node" style="top:40px; left:10%; border-color:#2563EB; color:#2563EB"><span>👤</span> Tariq Mansour</div>
-            <div class="graph-node" style="top:40px; right:10%; border-color:#059669; color:#059669"><span>☕</span> Glitchara Espresso</div>
-            <div class="graph-node" style="bottom:40px; left:40%; border-color:#D97706; color:#D97706"><span>🏪</span> Grand Plaza Mall</div>
-            
-            <div class="graph-line" style="top:60px; left:30%; width:30%;"></div>
-            <div style="position:absolute; top:45px; left:45%; font-size:10px; font-weight:700; color:#64748b; z-index:3; background:#fff; padding:2px 6px; border-radius:4px">purchased →</div>
-            
-            <div class="graph-line" style="top:90px; left:25%; width:20%; transform:rotate(45deg)"></div>
-            <div style="position:absolute; top:110px; left:22%; font-size:10px; font-weight:700; color:#64748b; z-index:3; background:#fff; padding:2px 6px; border-radius:4px">visited →</div>
-
-            <div class="graph-line" style="top:90px; right:25%; width:20%; transform:rotate(-45deg)"></div>
-            <div style="position:absolute; top:110px; right:22%; font-size:10px; font-weight:700; color:#64748b; z-index:3; background:#fff; padding:2px 6px; border-radius:4px">stocked at →</div>
-          </div>
-
-          <div class="mdm-q-box">
-            <div class="mdm-q-text">Marketing Question: "Which Gold customers bought Espresso at the Grand Plaza Mall?"</div>
-            <div id="mdm-q-result" class="mdm-res-box error">
-              ❌ <span style="color:#BE123C">Cannot Answer. Data is siloed. Systems don't talk to each other.</span>
+            <div class="mdm-q-box" style="grid-column: 1 / -1;">
+              <div class="mdm-q-text">Marketing Question: "Which Gold customers bought Espresso at the Grand Plaza Mall?"</div>
+              <div id="mdm-q-result" class="mdm-res-box error">
+                ❌ <span style="color:#BE123C">Cannot Answer. Data is siloed. Systems don't talk to each other.</span>
+              </div>
             </div>
+          </div>
+
+          <div id="mdm-multi" style="display:none;">
+            <div class="multi-graph-stage">
+              <svg class="graph-svg-layer">
+                <line id="svg-line-cl" x1="50%" y1="20%" x2="25%" y2="70%" class="svg-path" style="--pc:#D97706" />
+                <line id="svg-line-cp" x1="50%" y1="20%" x2="75%" y2="70%" class="svg-path" style="--pc:#059669" />
+                <line id="svg-line-lp" x1="25%" y1="70%" x2="75%" y2="70%" class="svg-path" style="--pc:#94a3b8" />
+              </svg>
+
+              <div class="g-node" style="top:10%; left:50%; transform:translateX(-50%); border-color:#2563EB;">
+                <span style="color:#60A5FA">Customer Domain</span>
+                <div style="display:flex;align-items:center;gap:6px;font-size:16px">👤 Tariq Mansour</div>
+              </div>
+
+              <div class="g-node" id="gn-loc" style="top:65%; left:25%; transform:translate(-50%, -50%); border-color:#475569;">
+                <span style="color:#FBBF24">Location Domain</span>
+                <div style="display:flex;align-items:center;gap:6px;font-size:14px">🏪 Grand Plaza Mall</div>
+              </div>
+
+              <div class="g-node" id="gn-prod" style="top:65%; left:75%; transform:translate(-50%, -50%); border-color:#475569;">
+                <span style="color:#34D399">Product Domain</span>
+                <div style="display:flex;align-items:center;gap:6px;font-size:14px">☕ Glitchara Espresso</div>
+              </div>
+
+              <div class="g-label" id="lbl-cl" style="top:42%; left:33%; transform:translate(-50%, -50%)">
+                <span style="color:#FBBF24">Visited 12x</span>
+                Last 30 Days
+              </div>
+
+              <div class="g-label" id="lbl-cp" style="top:42%; left:67%; transform:translate(-50%, -50%)">
+                <span style="color:#34D399">Purchased 8x</span>
+                Favorite Item
+              </div>
+
+              <div class="g-label" id="lbl-lp" style="top:70%; left:50%; transform:translate(-50%, -50%)">
+                <span>In Stock</span>
+                14 units available
+              </div>
+
+              <div id="mdm-insight" class="insight-overlay">
+                <h4>🎯 Targeted Retention Triggered</h4>
+                <p>Competitor mall opening 2km away detected. Multi-domain query instantly mapped Tariq's footprint and product preferences. <br><strong style="color:#059669;font-size:14px">Action:</strong> Automated 20% Espresso discount sent to Tariq for Grand Plaza Mall to ensure retention.</p>
+              </div>
+            </div>
+            
+            <button id="btn-run-scenario" class="btn-scenario" onclick="window.handleScenarioBtn()">▶ Run Retention Scenario</button>
           </div>
         </div>
 
