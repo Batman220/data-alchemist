@@ -1179,29 +1179,44 @@ const MDMDiagram = ({hex}) => {
         desc: "In B2B MDM, a customer is an organisation — not a person. The hierarchy tracks how companies relate: who owns whom, who reports to whom. This is critical for rolled-up reporting, credit risk, and account management.",
         nodes: [
           { id:"gp", label:"Glitchara Corporation", tag:"Ultimate Parent", icon:"🌐", color:"#7C3AED", light:"#F5F3FF", border:"#DDD6FE",
-            detail:{ role:"Ultimate Parent", desc:"The topmost legal entity that owns all subsidiaries. All financial exposure, compliance, and credit limits roll up here. In MDM, this node anchors the entire customer hierarchy.", props:[["Jurisdiction","Kuwait (HQ)"],["Employees","~50,000"],["Subsidiaries","80+ brands"],["MDM Role","Hierarchy root — survivorship winner for legal name & credit terms"]] },
+            detail:{ role:"Ultimate Parent", desc:"The topmost legal entity that owns all subsidiaries. All financial exposure, compliance, and credit limits roll up here.", props:[["Jurisdiction","Kuwait (HQ)"],["Employees","~50,000"],["Subsidiaries","80+ brands"],["MDM Role","Hierarchy root — survivorship winner for legal name & credit terms"]] },
             children: [
               { id:"mena", label:"Glitchara MENA Holdings", tag:"Regional Holding", icon:"🌍", color:"#2563EB", light:"#EFF6FF", border:"#BFDBFE",
-                detail:{ role:"Regional Holding", desc:"An intermediate holding company that groups all Middle East & North Africa legal entities under one reporting umbrella. Not always a trading entity — its primary role is structural consolidation.", props:[["Region","Middle East & North Africa"],["Type","Non-trading holding"],["MDM Role","Rollup node — aggregates credit exposure across UAE, KSA, Bahrain entities"]] },
+                detail:{ role:"Regional Holding", desc:"An intermediate holding company that groups all Middle East & North Africa legal entities.", props:[["Region","Middle East & North Africa"],["MDM Role","Rollup node — aggregates credit exposure across UAE, KSA, Bahrain entities"]] },
                 children: [
                   { id:"uae", label:"Glitchara UAE LLC", tag:"Legal Entity", icon:"🇦🇪", color:"#0891B2", light:"#ECFEFF", border:"#A5F3FC",
-                    detail:{ role:"Legal Entity", desc:"A legally registered trading company in the UAE. This is where transactions, invoices, and contracts are executed. The MDM golden record at this level holds the official trade licence number, VAT registration, and bank details.", props:[["Country","UAE"],["Trade Licence","DED-2019-00814"],["VAT Reg","100482917400003"],["MDM Role","Transaction entity — trusted source for address, tax ID, and bank account fields"]] },
+                    detail:{ role:"Legal Entity", desc:"A legally registered trading company in the UAE. This is where transactions are executed.", props:[["Country","UAE"],["Trade Licence","DED-2019-00814"],["VAT Reg","100482917400003"],["MDM Role","Transaction entity — trusted source for tax ID"]] },
                     children: [
                       { id:"sbux", label:"Glitchara Cafe UAE", tag:"Brand / Operating Unit", icon:"☕", color:"#059669", light:"#ECFDF5", border:"#A7F3D0",
-                        detail:{ role:"Brand / Operating Unit", desc:"A brand or business unit operating under the legal entity. Not a separate legal company — shares the parent's trade licence. MDM tracks it as a sub-account for brand-specific reporting, sales analytics, and loyalty programme data.", props:[["Brand","Glitchara Cafe (licensed)"],["Outlets","~250 UAE stores"],["MDM Role","Sub-account — brand rollup for sales reporting and CRM segmentation"]] },
+                        detail:{ role:"Brand / Operating Unit", desc:"A brand or business unit operating under the legal entity.", props:[["Brand","Glitchara Cafe"],["MDM Role","Sub-account — brand rollup for sales reporting"]] },
                         children: [
                           { id:"contact", label:"Tariq Mansour", tag:"Key Contact", icon:"👤", color:"#D97706", light:"#FFFBEB", border:"#FDE68A",
-                            detail:{ role:"Key Contact / Individual", desc:"The actual person MDM ultimately cares about — the buyer, decision maker, or relationship owner. In B2B MDM, an individual is always linked to their organisation, not free-floating.", props:[["Title","Procurement Manager"],["Email","t.mansour@glitchara.ae"],["MDM Role","Contact record — child of operating unit, linked to Person domain"],["Relationship","Employed by → Glitchara UAE LLC"]] }
+                            detail:{ role:"Key Contact / Individual", desc:"The actual person MDM ultimately cares about — the buyer, decision maker.", props:[["Title","Procurement Manager"],["Email","t.mansour@glitchara.ae"],["MDM Role","Contact record — linked to Person domain"]] }
                           }
                         ]
                       },
                       { id:"hm", label:"Glitchara Apparel UAE", tag:"Brand / Operating Unit", icon:"🛍️", color:"#059669", light:"#ECFDF5", border:"#A7F3D0",
-                        detail:{ role:"Brand / Operating Unit", desc:"Another brand under the same UAE legal entity. Multiple brands can share one legal company but need separate MDM sub-accounts for revenue reporting, loyalty, and supply chain.", props:[["Brand","Glitchara Apparel (licensed)"],["MDM Role","Parallel sub-account under same legal entity as Glitchara Cafe UAE"]] }
+                        detail:{ role:"Brand / Operating Unit", desc:"Another brand under the same UAE legal entity.", props:[["Brand","Glitchara Apparel"],["MDM Role","Parallel sub-account under same legal entity"]] },
+                        children: [
+                          { id:"contact2", label:"Sarah Jenkins", tag:"Key Contact", icon:"👤", color:"#D97706", light:"#FFFBEB", border:"#FDE68A",
+                            detail:{ role:"Key Contact / Individual", desc:"Apparel division buyer.", props:[["Title","Apparel Buyer"],["Email","s.jenkins@glitchara.ae"],["MDM Role","Contact record"]] }
+                          }
+                        ]
                       }
                     ]
                   },
                   { id:"ksa", label:"Glitchara KSA LLC", tag:"Legal Entity", icon:"🇸🇦", color:"#0891B2", light:"#ECFEFF", border:"#A5F3FC",
-                    detail:{ role:"Legal Entity", desc:"A separate legal entity registered in Saudi Arabia. Even though it's the same group, KSA requires its own CR number, VAT registration, and Zakat filings — hence a separate MDM node.", props:[["Country","Saudi Arabia"],["CR Number","1010XXXXXX"],["MDM Role","Sibling entity to Glitchara UAE — consolidated under MENA Holding"]] }
+                    detail:{ role:"Legal Entity", desc:"A separate legal entity registered in Saudi Arabia requiring its own CR number.", props:[["Country","Saudi Arabia"],["CR Number","1010XXXXXX"],["MDM Role","Sibling entity to Glitchara UAE"]] },
+                    children: [
+                      { id:"ksa_cafe", label:"Glitchara Cafe KSA", tag:"Brand / Operating Unit", icon:"☕", color:"#059669", light:"#ECFDF5", border:"#A7F3D0",
+                        detail:{ role:"Brand / Operating Unit", desc:"The Saudi Arabian operating branch of the cafe brand.", props:[["Brand","Glitchara Cafe"],["MDM Role","Sub-account for KSA sales reporting"]] },
+                        children: [
+                          { id:"ksa_contact", label:"Omar Al-Fayed", tag:"Key Contact", icon:"👤", color:"#D97706", light:"#FFFBEB", border:"#FDE68A",
+                            detail:{ role:"Key Contact / Individual", desc:"Regional operations manager for KSA.", props:[["Title","Operations Manager"],["Email","o.alfayed@glitchara.sa"],["MDM Role","Contact record"]] }
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               }
@@ -1211,8 +1226,7 @@ const MDMDiagram = ({hex}) => {
         relationships: [
           { from:"Glitchara UAE LLC", arrow:"→", type:"owns / controls", to:"Glitchara Cafe UAE", note:"Parent owns brand operating unit" },
           { from:"Tariq Mansour", arrow:"→", type:"is employed by", to:"Glitchara UAE LLC", note:"Contact linked to legal entity" },
-          { from:"Glitchara UAE LLC", arrow:"↔", type:"sibling of", to:"Glitchara KSA LLC", note:"Peer entities under same holding" },
-          { from:"Glitchara Cafe UAE", arrow:"→", type:"buys from", to:"External Supplier", note:"Cross-hierarchy relationship (Customer ↔ Vendor)" }
+          { from:"Glitchara UAE LLC", arrow:"↔", type:"sibling of", to:"Glitchara KSA LLC", note:"Peer entities under same holding" }
         ]
       },
       b2c: {
@@ -1220,85 +1234,62 @@ const MDMDiagram = ({hex}) => {
         desc: "In B2C, the customer is an individual. Hierarchies here model household groupings, shared accounts, and contact preferences — critical for loyalty, personalisation, and GDPR compliance.",
         nodes: [
           { id:"hh", label:"Mansour Household", tag:"Household", icon:"🏠", color:"#7C3AED", light:"#F5F3FF", border:"#DDD6FE",
-            detail:{ role:"Household", desc:"A household groups individuals sharing an address or financial relationship. MDM uses this for offer suppression (don't send duplicate mailers), household-level loyalty rollup, and combined spend analytics.", props:[["Address","Villa 14, Jumeirah, Dubai"],["MDM Role","Rollup node — household total spend, loyalty tier, marketing suppression"]] },
+            detail:{ role:"Household", desc:"A household groups individuals sharing an address or financial relationship.", props:[["Address","Villa 14, Jumeirah, Dubai"],["MDM Role","Rollup node — household total spend, marketing suppression"]] },
             children: [
               { id:"p1", label:"Tariq Mansour", tag:"Primary Account Holder", icon:"👤", color:"#2563EB", light:"#EFF6FF", border:"#BFDBFE",
-                detail:{ role:"Primary Account Holder", desc:"The main individual with the primary loyalty account, credit card, and communication preferences. Survivorship rules will prefer this record's email, phone, and opt-in preferences.", props:[["DOB","1982-09-14"],["Loyalty Tier","Gold"],["MDM Role","Primary — trusted source for contact preferences and identity"],["Email","tariq@email.com — verified 2024"]] },
+                detail:{ role:"Primary Account Holder", desc:"The main individual with the primary loyalty account.", props:[["DOB","1982-09-14"],["Loyalty Tier","Gold"],["Email","tariq@email.com — verified 2024"]] },
                 children: [
                   { id:"card", label:"NexusCard Gold ···4812", tag:"Linked Payment Method", icon:"💳", color:"#059669", light:"#ECFDF5", border:"#A7F3D0",
-                    detail:{ role:"Linked Asset", desc:"A payment method linked to the individual — not a person, but a related entity. MDM tracks these relationships to enable cross-domain insights (Customer ↔ Financial domain).", props:[["Type","NexusCard Credit"],["Linked to","Tariq Mansour"],["MDM Role","Related entity — cross-domain link to Financial domain"]] }
+                    detail:{ role:"Linked Asset", desc:"A payment method linked to the individual.", props:[["Type","NexusCard Credit"],["MDM Role","Related entity — cross-domain link to Financial domain"]] }
                   }
                 ]
               },
               { id:"p2", label:"Fatima Mansour", tag:"Household Member", icon:"👤", color:"#D97706", light:"#FFFBEB", border:"#FDE68A",
-                detail:{ role:"Household Member", desc:"A second individual in the same household. Has her own independent loyalty account but is grouped with the primary for household-level analytics. GDPR: each person has independent consent — never inherit from another household member.", props:[["Relationship","Spouse of Tariq"],["MDM Role","Household member — independent consent, grouped for spend rollup"],["Caution","Never merge records — link, don't merge"]] }
+                detail:{ role:"Household Member", desc:"A second individual in the same household. Has independent GDPR consent.", props:[["Relationship","Spouse of Tariq"],["MDM Role","Household member — independent consent"]] },
+                children: [
+                  { id:"f_tier", label:"Silver Loyalty Tier", tag:"Loyalty Account", icon:"🏷️", color:"#059669", light:"#ECFDF5", border:"#A7F3D0",
+                    detail:{ role:"Loyalty Account", desc:"Fatima's independent loyalty membership.", props:[["Tier","Silver"],["Points","4,250"],["MDM Role","Independent progression tracked under household"]] }
+                  }
+                ]
               }
             ]
           }
         ],
         relationships: [
           { from:"Tariq Mansour", arrow:"→", type:"is married to", to:"Fatima Mansour", note:"Peer relationship within household" },
-          { from:"Tariq Mansour", arrow:"→", type:"is parent of", to:"Child records (future)", note:"Generational hierarchy extension" },
           { from:"Mansour Household", arrow:"→", type:"linked to", to:"NexusCard Gold ···4812", note:"Cross-domain: Customer ↔ Financial" }
         ]
       },
       product: {
         label: "Product Hierarchy",
-        desc: "Products are organised in a category tree. MDM ensures the same SKU isn't duplicated across procurement, e-commerce, and ERP — and that all product attributes are mastered from the correct authoritative source.",
+        desc: "Products are organised in a category tree. MDM ensures the same SKU isn't duplicated across procurement, e-commerce, and ERP.",
         nodes: [
           { id:"cat", label:"Beverages", tag:"Category (L1)", icon:"🧃", color:"#7C3AED", light:"#F5F3FF", border:"#DDD6FE",
-            detail:{ role:"Top-Level Category", desc:"The broadest classification. Used for department-level reporting, procurement planning, and shelf-space allocation. MDM masters: category code, description, regulatory classification.", props:[["Category Code","BEV"],["MDM Role","Rollup for revenue, margin, and procurement spend by category"]] },
+            detail:{ role:"Top-Level Category", desc:"The broadest classification. Used for department-level reporting.", props:[["Category Code","BEV"],["MDM Role","Rollup for revenue by category"]] },
             children: [
               { id:"sub", label:"Hot Beverages", tag:"Sub-Category (L2)", icon:"☕", color:"#2563EB", light:"#EFF6FF", border:"#BFDBFE",
-                detail:{ role:"Sub-Category", desc:"A refinement of the top-level category. Drives planogram layout in retail (shelf position), pricing bands, and promotional eligibility rules.", props:[["Sub-Cat Code","BEV-HOT"],["MDM Role","Controls pricing tier assignment and promotion eligibility"]] },
+                detail:{ role:"Sub-Category", desc:"A refinement of the top-level category.", props:[["Sub-Cat Code","BEV-HOT"],["MDM Role","Controls pricing tier assignment"]] },
                 children: [
                   { id:"brand", label:"Glitchara Espresso", tag:"Brand/Range (L3)", icon:"⭐", color:"#0891B2", light:"#ECFEFF", border:"#A5F3FC",
-                    detail:{ role:"Brand / Product Range", desc:"A specific brand or product range within a sub-category. MDM masters: brand code, licensor, permitted markets, brand guidelines flag.", props:[["Brand Code","GL-ESP"],["Licensor","Glitchara Cafe Corp"],["MDM Role","Trusted source: brand name (licence agreement overrides all other sources)"]] },
+                    detail:{ role:"Brand / Product Range", desc:"A specific brand or product range within a sub-category.", props:[["Brand Code","GL-ESP"],["MDM Role","Trusted source: brand name"]] },
                     children: [
                       { id:"sku", label:"Espresso Roast 250g", tag:"SKU (Leaf)", icon:"📦", color:"#059669", light:"#ECFDF5", border:"#A7F3D0",
-                        detail:{ role:"SKU — Leaf Node", desc:"The actual sellable product unit. This is the most granular node MDM manages. Every source system refers to this by a different code — ERP has one SKU, e-commerce another, procurement a third. XREF maps them all to one Master Product ID.", props:[["ERP Code","MAT-00291-A"],["E-Comm Code","PROD-88124"],["Barcode","5012345678901"],["MDM Role","Golden Record: master product description, unit of measure, NFC classification, allergen flags — all sourced from PIM system (highest trust)"]] }
+                        detail:{ role:"SKU — Leaf Node", desc:"The actual sellable product unit.", props:[["ERP Code","MAT-00291-A"],["Barcode","5012345678901"],["MDM Role","Golden Record: master product description"]] }
                       }
                     ]
                   }
                 ]
               },
               { id:"cold", label:"Cold Beverages", tag:"Sub-Category (L2)", icon:"🧊", color:"#2563EB", light:"#EFF6FF", border:"#BFDBFE",
-                detail:{ role:"Sub-Category", desc:"Peer node to Hot Beverages. MDM manages both under the same category with independent sub-category codes but shared category-level attributes.", props:[["Sub-Cat Code","BEV-CLD"],["MDM Role","Sibling sub-category — parallel branch under Beverages"]] }
-              }
-            ]
-          }
-        ],
-        relationships: [
-          { from:"Espresso Roast 250g", arrow:"→", type:"manufactured by", to:"Supplier / Vendor domain", note:"Cross-domain: Product ↔ Vendor" },
-          { from:"Espresso Roast 250g", arrow:"→", type:"sold at", to:"Location domain (Stores)", note:"Cross-domain: Product ↔ Location" },
-          { from:"Glitchara Espresso", arrow:"→", type:"licensed from", to:"Glitchara Cafe Corp (3rd party)", note:"External relationship — licence agreement" }
-        ]
-      },
-      location: {
-        label: "Location Hierarchy",
-        desc: "Location MDM manages the full geography of where business happens — from country down to individual outlet. Critical for supply chain routing, tax jurisdiction, and regional rollups.",
-        nodes: [
-          { id:"global", label:"Global", tag:"Global Root", icon:"🌐", color:"#7C3AED", light:"#F5F3FF", border:"#DDD6FE",
-            detail:{ role:"Global Root", desc:"The topmost geography node. All financial reporting, compliance metrics, and supply chain totals roll up here. In practice, this node rarely stores attributes — it's structural.", props:[["MDM Role","Root rollup node — enables global P&L, inventory, and compliance reporting"]] },
-            children: [
-              { id:"mena_l", label:"MENA Region", tag:"Region (L1)", icon:"🌍", color:"#2563EB", light:"#EFF6FF", border:"#BFDBFE",
-                detail:{ role:"Geographic Region", desc:"A commercial or operational region grouping. Not a political boundary — defined by the business. MENA may be used for sales territory management, logistics hub assignment, and regulatory reporting clusters.", props:[["Region Code","MENA"],["MDM Role","Sales territory rollup, logistics hub assignment, VAT regime grouping"]] },
+                detail:{ role:"Sub-Category", desc:"Peer node to Hot Beverages.", props:[["Sub-Cat Code","BEV-CLD"],["MDM Role","Sibling sub-category"]] },
                 children: [
-                  { id:"uae_l", label:"United Arab Emirates", tag:"Country (L2)", icon:"🇦🇪", color:"#0891B2", light:"#ECFEFF", border:"#A5F3FC",
-                    detail:{ role:"Country", desc:"The political and legal boundary. MDM masters: ISO country code, currency, VAT rate, regulatory body. All tax calculations and legal entity assignments reference this node.", props:[["ISO Code","AE"],["Currency","AED"],["VAT Rate","5%"],["MDM Role","Trusted source: ISO code (ISO standard overrides all source systems)"]] },
+                  { id:"brand_c", label:"Glitchara Iced", tag:"Brand/Range (L3)", icon:"❄️", color:"#0891B2", light:"#ECFEFF", border:"#A5F3FC",
+                    detail:{ role:"Brand / Product Range", desc:"Cold beverage product line.", props:[["Brand Code","GL-ICE"],["MDM Role","Trusted source: brand name"]] },
                     children: [
-                      { id:"dxb", label:"Dubai", tag:"Emirate / State (L3)", icon:"🏙️", color:"#059669", light:"#ECFDF5", border:"#A7F3D0",
-                        detail:{ role:"Emirate / State", desc:"A sub-national administrative unit. Used for logistics routing (DXB vs AUH distribution centres), local regulatory compliance (RERA, DED licensing), and store-level territory assignment.", props:[["Code","DXB"],["MDM Role","Logistics zone assignment, local authority regulatory linkage"]] },
-                        children: [
-                          { id:"mall", label:"Grand Plaza Mall — Glitchara Cafe Outlet", tag:"Store / Site (Leaf)", icon:"🏪", color:"#D97706", light:"#FFFBEB", border:"#FDE68A",
-                            detail:{ role:"Store / Site — Leaf Node", desc:"The most granular location — a specific physical outlet. MDM masters: GPS coordinates, opening hours, capacity, assigned cost centre, and linked legal entity. This node connects Location domain to Customer and Product domains.", props:[["Site Code","DXB-GPM-GLC-001"],["Lat/Long","25.1972° N, 55.2796° E"],["Cost Centre","CC-DXB-2204"],["MDM Role","Point-of-sale anchor — links to Customer visits, Product sales, and Financial cost centre"]] }
-                          }
-                        ]
+                      { id:"sku_c", label:"Iced Vanilla Latte 500ml", tag:"SKU (Leaf)", icon:"🧋", color:"#059669", light:"#ECFDF5", border:"#A7F3D0",
+                        detail:{ role:"SKU — Leaf Node", desc:"Sellable cold product unit.", props:[["ERP Code","MAT-00882-C"],["Barcode","5012345999901"],["MDM Role","Golden Record"]] }
                       }
                     ]
-                  },
-                  { id:"ksa_l", label:"Saudi Arabia", tag:"Country (L2)", icon:"🇸🇦", color:"#0891B2", light:"#ECFEFF", border:"#A5F3FC",
-                    detail:{ role:"Country", desc:"Peer country node to UAE under MENA region. Separate tax regime (VAT 15%), separate Zakat obligations, and separate logistics infrastructure — all mastered independently.", props:[["ISO Code","SA"],["Currency","SAR"],["VAT Rate","15%"],["MDM Role","Independent regulatory node — Zakat, VAT, SAMA compliance"]] }
                   }
                 ]
               }
@@ -1306,8 +1297,53 @@ const MDMDiagram = ({hex}) => {
           }
         ],
         relationships: [
-          { from:"Grand Plaza Mall — Glitchara Cafe Outlet", arrow:"→", type:"operated by", to:"Glitchara UAE LLC (Customer domain)", note:"Cross-domain: Location ↔ Customer" },
-          { from:"Grand Plaza Mall — Glitchara Cafe Outlet", arrow:"→", type:"stocks", to:"Espresso Roast 250g (Product domain)", note:"Cross-domain: Location ↔ Product" },
+          { from:"Espresso Roast 250g", arrow:"→", type:"manufactured by", to:"Supplier / Vendor domain", note:"Cross-domain: Product ↔ Vendor" },
+          { from:"Espresso Roast 250g", arrow:"→", type:"sold at", to:"Location domain (Stores)", note:"Cross-domain: Product ↔ Location" }
+        ]
+      },
+      location: {
+        label: "Location Hierarchy",
+        desc: "Location MDM manages the full geography of where business happens — from country down to individual outlet.",
+        nodes: [
+          { id:"global", label:"Global", tag:"Global Root", icon:"🌐", color:"#7C3AED", light:"#F5F3FF", border:"#DDD6FE",
+            detail:{ role:"Global Root", desc:"The topmost geography node. All financial reporting rolls up here.", props:[["MDM Role","Root rollup node"]] },
+            children: [
+              { id:"mena_l", label:"MENA Region", tag:"Region (L1)", icon:"🌍", color:"#2563EB", light:"#EFF6FF", border:"#BFDBFE",
+                detail:{ role:"Geographic Region", desc:"A commercial or operational region grouping.", props:[["Region Code","MENA"],["MDM Role","Sales territory rollup"]] },
+                children: [
+                  { id:"uae_l", label:"United Arab Emirates", tag:"Country (L2)", icon:"🇦🇪", color:"#0891B2", light:"#ECFEFF", border:"#A5F3FC",
+                    detail:{ role:"Country", desc:"The political and legal boundary.", props:[["ISO Code","AE"],["Currency","AED"],["MDM Role","Trusted source: ISO code"]] },
+                    children: [
+                      { id:"dxb", label:"Dubai", tag:"Emirate / State (L3)", icon:"🏙️", color:"#059669", light:"#ECFDF5", border:"#A7F3D0",
+                        detail:{ role:"Emirate / State", desc:"A sub-national administrative unit.", props:[["Code","DXB"],["MDM Role","Logistics zone assignment"]] },
+                        children: [
+                          { id:"mall", label:"Grand Plaza Mall — Glitchara Cafe", tag:"Store / Site (Leaf)", icon:"🏪", color:"#D97706", light:"#FFFBEB", border:"#FDE68A",
+                            detail:{ role:"Store / Site — Leaf Node", desc:"The most granular location — a specific physical outlet.", props:[["Site Code","DXB-GPM-GLC-001"],["Cost Centre","CC-DXB-2204"],["MDM Role","Point-of-sale anchor"]] }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  { id:"ksa_l", label:"Saudi Arabia", tag:"Country (L2)", icon:"🇸🇦", color:"#0891B2", light:"#ECFEFF", border:"#A5F3FC",
+                    detail:{ role:"Country", desc:"Peer country node to UAE.", props:[["ISO Code","SA"],["Currency","SAR"],["MDM Role","Independent regulatory node"]] },
+                    children: [
+                      { id:"ruh", label:"Riyadh", tag:"Emirate / State (L3)", icon:"🏙️", color:"#059669", light:"#ECFDF5", border:"#A7F3D0",
+                        detail:{ role:"Emirate / State", desc:"Saudi capital administrative unit.", props:[["Code","RUH"],["MDM Role","Logistics zone assignment"]] },
+                        children: [
+                          { id:"mall_ruh", label:"Riyadh Park — Glitchara Cafe", tag:"Store / Site (Leaf)", icon:"🏪", color:"#D97706", light:"#FFFBEB", border:"#FDE68A",
+                            detail:{ role:"Store / Site — Leaf Node", desc:"Specific physical outlet in Riyadh.", props:[["Site Code","RUH-RP-GLC-005"],["Cost Centre","CC-RUH-8812"],["MDM Role","Point-of-sale anchor"]] }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        relationships: [
+          { from:"Grand Plaza Mall — Glitchara Cafe", arrow:"→", type:"operated by", to:"Glitchara UAE LLC (Customer domain)", note:"Cross-domain: Location ↔ Customer" },
           { from:"Dubai", arrow:"→", type:"governed by", to:"DED / RERA (External)", note:"Regulatory relationship" }
         ]
       }
@@ -1328,7 +1364,7 @@ const MDMDiagram = ({hex}) => {
       treeEl.innerHTML = '';
       relEl.style.display = 'none';
       relEl.innerHTML = '';
-      document.getElementById('hier-detail').innerHTML = `<div class="detail-empty"><div class="icon">🌳</div><div style="font-size:14px;font-weight:600;color:#64748b">Click any node</div><div style="font-size:12px;text-align:center">to understand its role in the hierarchy</div></div>`;
+      document.getElementById('hier-detail').innerHTML = `<div class="detail-empty"><div class="icon">🌳</div><div style="font-size:14px;font-weight:600;color:#64748b">Click any node</div></div>`;
 
       function buildNode(node) {
         const wrap = document.createElement('div');
@@ -1393,25 +1429,20 @@ const MDMDiagram = ({hex}) => {
           {name:"Email", trusted:true, src:"CRM"},
           {name:"Mobile", trusted:true, src:"CRM"},
           {name:"Address", trusted:false, src:"CRM"},
-          {name:"Account No.", trusted:false, src:"CRM"},
         ]
       },
       {
         sys:"CoreDB ERP", icon:"🗄️", bg:"#FFF7ED", border:"#EA580C", c:"#EA580C", light:"rgba(234,88,12,.1)",
         fields:[
           {name:"Full Name", trusted:false, src:"ERP"},
-          {name:"Email", trusted:false, src:"ERP"},
           {name:"Address", trusted:true, src:"ERP"},
-          {name:"Account No.", trusted:true, src:"ERP"},
           {name:"Tax ID", trusted:true, src:"ERP"},
         ]
       },
       {
-        sys:"Mobile App / Portal", icon:"📱", bg:"#F0FDF4", border:"#16A34A", c:"#16A34A", light:"rgba(22,163,74,.1)",
+        sys:"Portal", icon:"📱", bg:"#F0FDF4", border:"#16A34A", c:"#16A34A", light:"rgba(22,163,74,.1)",
         fields:[
           {name:"Preferences", trusted:true, src:"Portal"},
-          {name:"Mobile", trusted:false, src:"Portal"},
-          {name:"Digital ID", trusted:true, src:"Portal"},
           {name:"Opt-In Status", trusted:true, src:"Portal"},
         ]
       }
@@ -1422,15 +1453,14 @@ const MDMDiagram = ({hex}) => {
       {name:"Email", src:"CRM", c:"#2563EB", light:"rgba(37,99,235,.1)"},
       {name:"Mobile", src:"CRM", c:"#2563EB", light:"rgba(37,99,235,.1)"},
       {name:"Address", src:"ERP", c:"#EA580C", light:"rgba(234,88,12,.1)"},
-      {name:"Account No.", src:"ERP", c:"#EA580C", light:"rgba(234,88,12,.1)"},
       {name:"Tax ID", src:"ERP", c:"#EA580C", light:"rgba(234,88,12,.1)"},
       {name:"Preferences", src:"Portal", c:"#16A34A", light:"rgba(22,163,74,.1)"},
-      {name:"Digital ID", src:"Portal", c:"#16A34A", light:"rgba(22,163,74,.1)"},
       {name:"Opt-In Status", src:"Portal", c:"#16A34A", light:"rgba(22,163,74,.1)"},
     ];
 
     window.buildTrustUI = function() {
       const srcEl = document.getElementById('trust-sources');
+      if(!srcEl) return;
       srcEl.innerHTML = '';
       window.TRUST_SOURCES.forEach((s,si) => {
         const card = document.createElement('div');
@@ -1447,7 +1477,6 @@ const MDMDiagram = ({hex}) => {
             ${s.fields.map((f,fi)=>`
               <div class="trust-field" id="tf-${si}-${fi}" style="--c:${s.c};--c-light:${s.light};background:${f.trusted?s.light:'#f8fafc'};border-color:${f.trusted?s.c:'#e2e8f0'};color:${f.trusted?s.c:'#94a3b8'}">
                 ${f.trusted?'✓':''} ${f.name}
-                ${f.trusted?`<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:${s.c};color:#fff;font-weight:700">TRUSTED</span>`:''}
               </div>
             `).join('')}
           </div>
@@ -1495,7 +1524,7 @@ const MDMDiagram = ({hex}) => {
       setTimeout(() => {
         window.animRunning = false;
         document.getElementById('btn-play').disabled = false;
-        document.getElementById('trust-note').innerHTML = `<strong>✅ Golden Record assembled!</strong> Each field came from the most trusted source: Full Name/Email/Mobile from CloudCRM (highest completeness score), Address/Account/Tax from CoreDB ERP (system of record for financial data), Preferences/Digital ID/Opt-In from Portal (only source that holds this data). Survivorship complete.`;
+        document.getElementById('trust-note').innerHTML = `<strong>✅ Golden Record assembled!</strong> The engine applied trust rules field-by-field.`;
       }, 2200 + window.GOLDEN_FIELDS.length * 180 + 400);
     };
 
@@ -1505,7 +1534,69 @@ const MDMDiagram = ({hex}) => {
       document.getElementById('flow-dot').style.opacity = '0';
       document.querySelectorAll('.trust-card').forEach(c=>c.classList.remove('firing'));
       document.querySelectorAll('.golden-field').forEach(f=>f.classList.remove('lit'));
-      document.getElementById('trust-note').innerHTML = `<strong>How survivorship works:</strong> The MDM engine applies trust rules field-by-field. The most trusted source for each field wins. If trust is equal, recency or completeness breaks the tie.`;
+      document.getElementById('trust-note').innerHTML = `<strong>How survivorship works:</strong> The MDM engine applies trust rules field-by-field.`;
+    };
+
+    window.toggleMDMMode = function(mode, el) {
+      document.querySelectorAll('.mdm-mode-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      if(mode === 'single') {
+        document.getElementById('mdm-single').style.display = 'grid';
+        document.getElementById('mdm-multi').style.display = 'none';
+        document.getElementById('mdm-q-result').innerHTML = `❌ <span style="color:#BE123C">Cannot Answer. Data is siloed. Systems don't talk to each other.</span>`;
+        document.getElementById('mdm-q-result').className = "mdm-res-box error";
+      } else {
+        document.getElementById('mdm-single').style.display = 'none';
+        document.getElementById('mdm-multi').style.display = 'block';
+        document.getElementById('mdm-q-result').innerHTML = `✅ <span style="color:#059669">Tariq Mansour</span> <span style="color:#64748b;font-weight:500;font-size:12px">(Graph relationships queried across 3 domains instantly)</span>`;
+        document.getElementById('mdm-q-result').className = "mdm-res-box success";
+      }
+    };
+
+    window.runKeyAnim = function(type) {
+      const emailEl = document.getElementById('nat-email');
+      const fks = document.querySelectorAll('.nat-fk');
+      const msg = document.getElementById('key-msg');
+      const wrapper = document.getElementById('nat-box');
+      
+      const surEmail = document.getElementById('sur-email');
+      const surMsg = document.getElementById('sur-msg');
+
+      if(type === 'natural') {
+        emailEl.innerText = "tariq.new@email.com";
+        emailEl.style.color = "#E11D48";
+        emailEl.style.fontWeight = "800";
+        fks.forEach(fk => {
+          fk.classList.add('broken');
+          fk.innerText = "tariq@email.com (BROKEN LINK)";
+        });
+        wrapper.classList.add('broken-wrap');
+        msg.innerHTML = "🚨 <strong>CRITICAL ERROR:</strong> The Primary Key changed! All related transaction tables (Orders, Support, Billing) have lost their link to the customer. A massive cascading update across millions of rows is now required.";
+        msg.style.display = "block";
+      } else {
+        surEmail.innerText = "tariq.new@email.com";
+        surEmail.style.color = "#059669";
+        surEmail.style.fontWeight = "800";
+        surMsg.innerHTML = "✅ <strong>SUCCESS:</strong> Email attribute updated safely. The Primary Key (UUID) never changes, so zero related tables were broken.";
+        surMsg.style.display = "block";
+      }
+    };
+
+    window.resetKeyAnim = function() {
+      document.getElementById('nat-email').innerText = "tariq@email.com";
+      document.getElementById('nat-email').style.color = "inherit";
+      document.getElementById('nat-email').style.fontWeight = "inherit";
+      document.querySelectorAll('.nat-fk').forEach(fk => {
+        fk.classList.remove('broken');
+        fk.innerText = "tariq@email.com";
+      });
+      document.getElementById('nat-box').classList.remove('broken-wrap');
+      document.getElementById('key-msg').style.display = "none";
+
+      document.getElementById('sur-email').innerText = "tariq@email.com";
+      document.getElementById('sur-email').style.color = "inherit";
+      document.getElementById('sur-email').style.fontWeight = "inherit";
+      document.getElementById('sur-msg').style.display = "none";
     };
 
     window.renderTree();
@@ -1514,7 +1605,8 @@ const MDMDiagram = ({hex}) => {
     return () => {
       delete window.showPanel; delete window.loadHier; delete window.renderTree;
       delete window.renderRelationships; delete window.selectNode; delete window.buildTrustUI;
-      delete window.runTrustAnimation; delete window.resetTrust; delete window.HIER_DATA;
+      delete window.runTrustAnimation; delete window.resetTrust; delete window.toggleMDMMode;
+      delete window.runKeyAnim; delete window.resetKeyAnim; delete window.HIER_DATA;
       delete window.TRUST_SOURCES; delete window.GOLDEN_FIELDS; delete window.animRunning;
       delete window.currentHier;
     };
@@ -1523,21 +1615,22 @@ const MDMDiagram = ({hex}) => {
   return (
     <div style={{ borderRadius: "16px", overflow: "hidden", border: "1.5px solid var(--bdr)", background: "#f0f4f8" }}>
       <style dangerouslySetInnerHTML={{__html: `
-        .nav{display:flex;gap:0;background:#fff;border-bottom:2px solid #e2e8f0;padding:0 24px}
-        .nav-tab{padding:16px 24px;font-size:13px;font-weight:600;letter-spacing:.5px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:#64748b;transition:all .2s;white-space:nowrap}
+        .nav{display:flex;gap:0;background:#fff;border-bottom:2px solid #e2e8f0;padding:0 24px;overflow-x:auto}
+        .nav-tab{padding:16px 20px;font-size:13px;font-weight:600;letter-spacing:.5px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:#64748b;transition:all .2s;white-space:nowrap}
         .nav-tab.active{color:#7C3AED;border-bottom-color:#7C3AED}
         .nav-tab:hover:not(.active){color:#334155;background:#f8fafc}
         .panel{display:none;padding:32px 24px;max-width:1100px;margin:0 auto}
-        .panel.active{display:block}
+        .panel.active{display:block;animation:fadeIn .3s ease}
         .section-title{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700;color:#0f172a;margin-bottom:6px}
         .section-sub{font-size:14px;color:#64748b;margin-bottom:28px;line-height:1.6}
+        
         .hier-tabs{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
         .hier-tab{padding:8px 20px;border-radius:999px;border:2px solid #e2e8f0;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;background:#fff;color:#64748b}
         .hier-tab.active{background:#7C3AED;border-color:#7C3AED;color:#fff}
-        .hier-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+        .hier-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:24px}
         @media(max-width:760px){.hier-grid{grid-template-columns:1fr}}
         .hier-tree-wrap{background:#fff;border-radius:20px;padding:24px;border:1.5px solid #e2e8f0;box-shadow:0 2px 12px rgba(0,0,0,.05)}
-        .hier-detail{background:#fff;border-radius:20px;padding:24px;border:1.5px solid #e2e8f0;box-shadow:0 2px 12px rgba(0,0,0,.05);min-height:320px}
+        .hier-detail{background:#fff;border-radius:20px;padding:24px;border:1.5px solid #e2e8f0;box-shadow:0 2px 12px rgba(0,0,0,.05);min-height:320px;align-self:start;position:sticky;top:20px}
         .tree-label{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#94a3b8;margin-bottom:16px}
         .tree-node{position:relative;margin-left:0}
         .tree-node+.tree-node{margin-top:4px}
@@ -1563,6 +1656,25 @@ const MDMDiagram = ({hex}) => {
         .prop-row{display:flex;gap:8px;font-size:12px}
         .prop-key{font-weight:600;color:#64748b;min-width:110px}
         .prop-val{color:#334155}
+        
+        .mdm-mode-tabs {display:inline-flex; background:#e2e8f0; border-radius:30px; padding:4px; margin-bottom:24px;}
+        .mdm-mode-btn {background:transparent; border:none; border-radius:24px; padding:8px 20px; font-size:13px; font-weight:700; color:#64748b; cursor:pointer; transition:all .2s;}
+        .mdm-mode-btn.active {background:#7C3AED; color:#fff; box-shadow:0 4px 12px rgba(124,58,237,.3);}
+        .silo-grid {display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; margin-bottom:24px;}
+        @media(max-width:700px){.silo-grid {grid-template-columns:1fr;}}
+        .md-silo {background:#fff; border:2px solid #e2e8f0; border-radius:16px; padding:20px; text-align:center; position:relative;}
+        .md-silo-title {font-size:11px; font-weight:800; letter-spacing:1px; margin-bottom:12px;}
+        .md-silo-data {background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px; font-size:12px; font-weight:600; color:#334155; display:flex; flex-direction:column; gap:4px; align-items:center;}
+        .md-silo-data span {font-size:24px; margin-bottom:4px;}
+        .mdm-q-box {background:#fff; border:1.5px solid #e2e8f0; border-radius:16px; padding:24px; text-align:center;}
+        .mdm-q-text {font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:700; color:#1e293b; margin-bottom:16px;}
+        .mdm-res-box {padding:12px 20px; border-radius:12px; font-size:15px; font-weight:700; display:inline-flex; align-items:center; gap:10px; margin:0 auto;}
+        .mdm-res-box.error {background:#FFF1F2; border:1.5px solid #FECDD3;}
+        .mdm-res-box.success {background:#ECFDF5; border:1.5px solid #A7F3D0;}
+        .multi-graph-box {background:#fff; border:2px solid #DDD6FE; border-radius:16px; padding:40px 20px; position:relative; overflow:hidden;}
+        .graph-node {position:absolute; background:#fff; border:2px solid; border-radius:12px; padding:10px 16px; font-size:12px; font-weight:700; display:flex; align-items:center; gap:8px; z-index:2; box-shadow:0 4px 12px rgba(0,0,0,.05);}
+        .graph-line {position:absolute; border-top:2px dashed #94a3b8; z-index:1; animation:dashFlow 4s linear infinite;}
+
         .trust-layout{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:start}
         @media(max-width:800px){.trust-layout{grid-template-columns:1fr;gap:20px}}
         .trust-sources{display:flex;flex-direction:column;gap:12px}
@@ -1575,71 +1687,53 @@ const MDMDiagram = ({hex}) => {
         .trust-fields{display:flex;flex-wrap:wrap;gap:6px}
         .trust-field{padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;border:1.5px solid;display:flex;align-items:center;gap:4px;transition:all .3s}
         .trust-field.trusted{background:var(--c-light)!important;border-color:var(--c)!important;color:var(--c)!important}
-        .trust-field.particle{animation:shoot .6s ease-in forwards}
-        @keyframes shoot{0%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.8}100%{transform:scale(.8);opacity:0}}
         .trust-flow{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 12px;gap:6px}
         .flow-line{width:60px;height:3px;background:linear-gradient(90deg,#e2e8f0,#7C3AED);border-radius:2px;position:relative;overflow:hidden}
-        .flow-line::after{content:'';position:absolute;left:-100%;top:0;width:100%;height:100%;background:linear-gradient(90deg,transparent,#fff,transparent);animation:shimmer 1.5s ease infinite}
-        .flow-line.active::after{animation:shimmer 1.5s ease infinite}
-        @keyframes shimmer{0%{left:-100%}100%{left:200%}}
         .flow-dot{width:8px;height:8px;border-radius:50%;background:#7C3AED;animation:pulse-dot 1s ease infinite}
-        @keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.6}}
         .golden-wrap{background:#fff;border-radius:20px;border:2px solid #F59E0B;box-shadow:0 0 0 6px rgba(245,158,11,.08);padding:24px;min-width:220px}
         .golden-title{display:flex;align-items:center;gap:8px;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:16px;color:#92400E;margin-bottom:16px}
         .golden-field{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;margin-bottom:6px;font-size:12px;font-weight:600;transition:all .4s;background:#f8fafc;border:1.5px solid #e2e8f0;opacity:.3}
         .golden-field.lit{opacity:1;background:var(--c-light);border-color:var(--c);animation:popIn .4s ease}
-        @keyframes popIn{0%{transform:scale(.95)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
         .golden-field .src-badge{font-size:10px;padding:2px 7px;border-radius:5px;margin-left:auto;font-weight:700}
         .trust-controls{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
         .btn-trust{padding:10px 20px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif}
         .btn-play{background:#7C3AED;color:#fff}
         .btn-play:hover{background:#6D28D9}
         .btn-reset{background:#f1f5f9;color:#64748b;border:1.5px solid #e2e8f0}
-        .btn-reset:hover{background:#e2e8f0}
-        .trust-note{font-size:12px;color:#64748b;margin-top:12px;padding:12px 16px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;line-height:1.6}
+        
         .xref-scenario{background:#fff;border-radius:20px;padding:24px;border:1.5px solid #e2e8f0;margin-bottom:24px}
         .xref-scenario-title{font-size:12px;font-weight:700;letter-spacing:1px;color:#94a3b8;margin-bottom:6px}
-        .xref-scenario-desc{font-size:14px;color:#334155;line-height:1.6}
-        .xref-canvas{background:#fff;border-radius:20px;padding:28px;border:1.5px solid #e2e8f0;overflow-x:auto}
+        .xref-canvas{background:#fff;border-radius:20px;padding:28px;border:1.5px solid #e2e8f0;overflow-x:auto;margin-bottom:24px}
         .xref-systems{display:flex;gap:16px;margin-bottom:32px;flex-wrap:wrap}
         .xref-sys-card{flex:1;min-width:160px;border-radius:16px;border:2px solid;padding:14px;text-align:center}
         .xref-sys-title{font-weight:700;font-size:13px;margin-bottom:4px}
         .xref-sys-sub{font-size:11px;color:#94a3b8;margin-bottom:12px}
-        .xref-id-pill{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;border:1.5px dashed;cursor:pointer;transition:all .2s;display:inline-block}
-        .xref-id-pill:hover{transform:scale(1.05)}
-        .xref-table-wrap{margin-top:8px}
-        .xref-table-title{font-size:12px;font-weight:700;letter-spacing:1px;color:#94a3b8;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-        table.xref{width:100%;border-collapse:collapse;font-size:13px}
-        table.xref th{background:#f8fafc;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.5px;color:#64748b;border-bottom:2px solid #e2e8f0}
-        table.xref td{padding:10px 14px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
-        table.xref tr:hover td{background:#faf5ff}
-        .xref-highlight{background:rgba(124,58,237,.08)!important;font-weight:700;color:#7C3AED}
-        .master-id-box{background:linear-gradient(135deg,#7C3AED,#DB2777);color:#fff;border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-top:20px}
-        .master-id-icon{font-size:28px}
-        .master-id-label{font-size:11px;font-weight:700;letter-spacing:1px;opacity:.8;margin-bottom:2px}
-        .master-id-val{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700}
-        .master-id-note{font-size:12px;opacity:.75;margin-top:2px}
-        .xref-explainer{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:20px}
-        @media(max-width:700px){.xref-explainer{grid-template-columns:1fr}}
-        .xref-exp-card{background:#f8fafc;border-radius:12px;padding:14px;border:1px solid #e2e8f0}
-        .xref-exp-icon{font-size:22px;margin-bottom:6px}
-        .xref-exp-title{font-weight:700;font-size:13px;color:#0f172a;margin-bottom:4px}
-        .xref-exp-text{font-size:12px;color:#64748b;line-height:1.6}
-        .xref-connectors{display:flex;justify-content:space-around;padding:0 20px;position:relative;margin-bottom:8px}
-        .xref-line-down{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-        .xref-vline{width:2px;height:32px;background:linear-gradient(to bottom,var(--c),#7C3AED);opacity:.5}
-        .xref-dot{width:8px;height:8px;border-radius:50%;background:#7C3AED}
-        .xref-hub-label{text-align:center;font-size:11px;font-weight:700;letter-spacing:1px;color:#7C3AED;margin-bottom:12px}
+        .xref-id-pill{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;border:1.5px dashed;cursor:pointer;display:inline-block}
+        
+        .key-grid {display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+        @media(max-width:700px){.key-grid{grid-template-columns:1fr;}}
+        .key-box {background:#fff; border:2px solid #e2e8f0; border-radius:16px; padding:20px;}
+        .key-header {font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:8px;}
+        .key-db {background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-top:14px;}
+        .db-row {display:flex; justify-content:space-between; font-size:12px; border-bottom:1px solid #f1f5f9; padding:6px 0;}
+        .db-row:last-child {border:none; padding-bottom:0;}
+        .pk-badge {background:#FDE68A; color:#92400E; font-size:9px; font-weight:800; padding:2px 6px; border-radius:4px; margin-left:6px;}
+        
+        .broken-wrap {border-color: #FECDD3 !important; background: #FFF1F2 !important; transition:all .3s;}
+        .broken {color: #BE123C !important; text-decoration: line-through; animation: shake 0.4s ease;}
+        @keyframes shake { 0%, 100% {transform:translateX(0)} 25% {transform:translateX(-4px)} 75% {transform:translateX(4px)} }
       `}} />
       <div dangerouslySetInnerHTML={{__html: `
         <div class="nav">
-          <div class="nav-tab active" onclick="window.showPanel('hierarchy',this)">🌳 Hierarchies + Relationships</div>
-          <div class="nav-tab" onclick="window.showPanel('trust',this)">🏅 Trust Settings + Golden Record</div>
-          <div class="nav-tab" onclick="window.showPanel('xref',this)">🔗 XREF Concept</div>
+          <div class="nav-tab active" onclick="window.showPanel('hierarchy',this)">🌳 Hierarchies</div>
+          <div class="nav-tab" onclick="window.showPanel('multidomain',this)">🌐 Multi-Domain</div>
+          <div class="nav-tab" onclick="window.showPanel('trust',this)">⚖️ Trust Rules</div>
+          <div class="nav-tab" onclick="window.showPanel('xref',this)">🔗 XREF & Keys</div>
         </div>
+        
         <div id="panel-hierarchy" class="panel active">
-          <div class="section-title">MDM Hierarchies — Structure + Relationships</div>
-          <div class="section-sub">Hierarchies define parent-child structure. Relationships define how entities connect <em>across</em> hierarchies. Click any node to understand its role.</div>
+          <div class="section-title">MDM Hierarchies — Completing the Tree</div>
+          <div class="section-sub">Hierarchies define parent-child structure. Notice how every branch now extends fully down to its leaf node (the specific brand, store, or SKU). Click any node to inspect.</div>
           <div class="hier-tabs">
             <div class="hier-tab active" onclick="window.loadHier('b2b',this)">🏢 B2B Customer</div>
             <div class="hier-tab" onclick="window.loadHier('b2c',this)">👤 B2C Customer</div>
@@ -1656,11 +1750,58 @@ const MDMDiagram = ({hex}) => {
               <div class="detail-empty">
                 <div class="icon">🌳</div>
                 <div style="font-size:14px;font-weight:600;color:#64748b">Click any node</div>
-                <div style="font-size:12px;text-align:center">to understand its role in the hierarchy</div>
               </div>
             </div>
           </div>
         </div>
+
+        <div id="panel-multidomain" class="panel">
+          <div class="section-title">Single Domain vs. Multi-Domain MDM</div>
+          <div class="section-sub">A Single Domain implementation masters one type of data (e.g. just Products). A Multi-Domain implementation masters multiple entities and connects them via relationships, unlocking true enterprise intelligence.</div>
+          
+          <div class="mdm-mode-tabs">
+            <button class="mdm-mode-btn active" onclick="window.toggleMDMMode('single', this)">📦 Single Domain (Silos)</button>
+            <button class="mdm-mode-btn" onclick="window.toggleMDMMode('multi', this)">🌐 Multi-Domain (Graph)</button>
+          </div>
+
+          <div class="silo-grid" id="mdm-single">
+            <div class="md-silo">
+              <div class="md-silo-title" style="color:#2563EB">CUSTOMER DOMAIN</div>
+              <div class="md-silo-data"><span>👤</span> Tariq Mansour<br/><span style="font-size:10px;color:#94a3b8">Loyalty: Gold</span></div>
+            </div>
+            <div class="md-silo">
+              <div class="md-silo-title" style="color:#059669">PRODUCT DOMAIN</div>
+              <div class="md-silo-data"><span>☕</span> Glitchara Espresso<br/><span style="font-size:10px;color:#94a3b8">SKU: ESP-250</span></div>
+            </div>
+            <div class="md-silo">
+              <div class="md-silo-title" style="color:#D97706">LOCATION DOMAIN</div>
+              <div class="md-silo-data"><span>🏪</span> Grand Plaza Mall<br/><span style="font-size:10px;color:#94a3b8">DXB-GPM-001</span></div>
+            </div>
+          </div>
+
+          <div class="multi-graph-box" id="mdm-multi" style="display:none; height:220px; margin-bottom:24px;">
+            <div class="graph-node" style="top:40px; left:10%; border-color:#2563EB; color:#2563EB"><span>👤</span> Tariq Mansour</div>
+            <div class="graph-node" style="top:40px; right:10%; border-color:#059669; color:#059669"><span>☕</span> Glitchara Espresso</div>
+            <div class="graph-node" style="bottom:40px; left:40%; border-color:#D97706; color:#D97706"><span>🏪</span> Grand Plaza Mall</div>
+            
+            <div class="graph-line" style="top:60px; left:30%; width:30%;"></div>
+            <div style="position:absolute; top:45px; left:45%; font-size:10px; font-weight:700; color:#64748b; z-index:3; background:#fff; padding:2px 6px; border-radius:4px">purchased →</div>
+            
+            <div class="graph-line" style="top:90px; left:25%; width:20%; transform:rotate(45deg)"></div>
+            <div style="position:absolute; top:110px; left:22%; font-size:10px; font-weight:700; color:#64748b; z-index:3; background:#fff; padding:2px 6px; border-radius:4px">visited →</div>
+
+            <div class="graph-line" style="top:90px; right:25%; width:20%; transform:rotate(-45deg)"></div>
+            <div style="position:absolute; top:110px; right:22%; font-size:10px; font-weight:700; color:#64748b; z-index:3; background:#fff; padding:2px 6px; border-radius:4px">stocked at →</div>
+          </div>
+
+          <div class="mdm-q-box">
+            <div class="mdm-q-text">Marketing Question: "Which Gold customers bought Espresso at the Grand Plaza Mall?"</div>
+            <div id="mdm-q-result" class="mdm-res-box error">
+              ❌ <span style="color:#BE123C">Cannot Answer. Data is siloed. Systems don't talk to each other.</span>
+            </div>
+          </div>
+        </div>
+
         <div id="panel-trust" class="panel">
           <div class="section-title">Trust Settings — How a Golden Record is Born</div>
           <div class="section-sub">Each source system is trusted for specific fields. MDM evaluates trust scores and survivorship rules to assemble the final Golden Record. Watch the animation.</div>
@@ -1680,7 +1821,7 @@ const MDMDiagram = ({hex}) => {
                 <div id="golden-fields"></div>
               </div>
               <div class="trust-note" id="trust-note" style="margin-top:16px">
-                <strong>How survivorship works:</strong> The MDM engine applies trust rules field-by-field. The most trusted source for each field wins. If trust is equal, recency or completeness breaks the tie.
+                <strong>How survivorship works:</strong> The MDM engine applies trust rules field-by-field.
               </div>
             </div>
           </div>
@@ -1689,139 +1830,255 @@ const MDMDiagram = ({hex}) => {
             <button class="btn-trust btn-reset" onclick="window.resetTrust()">↺ Reset</button>
           </div>
         </div>
+
         <div id="panel-xref" class="panel">
-          <div class="section-title">Cross-Reference (XREF) — The Identity Bridge</div>
-          <div class="section-sub">The same real-world entity appears in multiple source systems with different IDs. XREF is the MDM Hub's mapping table that says: "These are all the same person."</div>
-          <div class="xref-scenario">
-            <div class="xref-scenario-title">THE SCENARIO</div>
-            <div class="xref-scenario-desc">
-              <strong>Tariq Mansour</strong> is a customer at a regional bank. He exists in three separate systems — each created his record independently with a different identifier. The MDM Hub must recognise they are the same person and assign one master ID, while keeping track of all source IDs in the XREF table.
-            </div>
-          </div>
+          <div class="section-title">Cross-Reference (XREF) & Key Architecture</div>
+          <div class="section-sub">XREF is the mapping table that says: "These source IDs are all the same person." But how should we build the Master ID? Here we explore the critical difference between Natural and Surrogate keys.</div>
+          
           <div class="xref-canvas">
             <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:#94a3b8;margin-bottom:12px">SOURCE SYSTEMS — same person, different IDs</div>
             <div class="xref-systems">
               <div class="xref-sys-card" style="--c:#2563EB;border-color:#BFDBFE;background:#EFF6FF">
                 <div style="font-size:26px;margin-bottom:6px">🏦</div>
-                <div class="xref-sys-title" style="color:#1D4ED8">Core Banking (CoreDB)</div>
-                <div class="xref-sys-sub">CRM of record since 2019</div>
+                <div class="xref-sys-title" style="color:#1D4ED8">Core Banking</div>
                 <div class="xref-id-pill" style="border-color:#2563EB;color:#1D4ED8;background:#DBEAFE">CUST-00482</div>
               </div>
               <div class="xref-sys-card" style="--c:#7C3AED;border-color:#DDD6FE;background:#F5F3FF">
                 <div style="font-size:26px;margin-bottom:6px">💳</div>
-                <div class="xref-sys-title" style="color:#6D28D9">Card System (FinTech Core)</div>
-                <div class="xref-sys-sub">Cards since 2020</div>
+                <div class="xref-sys-title" style="color:#6D28D9">Card System</div>
                 <div class="xref-id-pill" style="border-color:#7C3AED;color:#6D28D9;background:#EDE9FE">CC-917-XL</div>
               </div>
               <div class="xref-sys-card" style="--c:#059669;border-color:#A7F3D0;background:#ECFDF5">
-                <div style="font-size:26px;margin-bottom:6px">📱</div>
-                <div class="xref-sys-title" style="color:#047857">Mobile App</div>
-                <div class="xref-sys-sub">Digital since 2022</div>
-                <div class="xref-id-pill" style="border-color:#059669;color:#047857;background:#D1FAE5">USR-20220847</div>
-              </div>
-              <div class="xref-sys-card" style="--c:#D97706;border-color:#FDE68A;background:#FFFBEB">
-                <div style="font-size:26px;margin-bottom:6px">🤝</div>
-                <div class="xref-sys-title" style="color:#B45309">CRM (CloudCRM)</div>
-                <div class="xref-sys-sub">Relationship mgmt</div>
-                <div class="xref-id-pill" style="border-color:#D97706;color:#B45309;background:#FEF3C7">SF-ACT-7719</div>
+                <div class="xref-sys-title" style="color:#047857">Master MDM Hub</div>
+                <div class="xref-id-pill" style="border-color:#059669;color:#fff;background:#059669;margin-top:4px">🏅 MDM-GR-128371</div>
               </div>
             </div>
-            <div class="xref-connectors">
-              <div class="xref-line-down"><div class="xref-vline" style="--c:#2563EB"></div></div>
-              <div class="xref-line-down"><div class="xref-vline" style="--c:#7C3AED"></div></div>
-              <div class="xref-line-down"><div class="xref-vline" style="--c:#059669"></div></div>
-              <div class="xref-line-down"><div class="xref-vline" style="--c:#D97706"></div></div>
+            
+            <div style="border-top:1px dashed #e2e8f0; margin:32px 0 24px;"></div>
+            
+            <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:700; color:#0f172a; margin-bottom:8px">The Danger of Natural Keys</div>
+            <div style="font-size:13px; color:#475569; margin-bottom:20px; line-height:1.6">A <strong>Natural Key</strong> uses real-world data (like an email address) as the Primary ID. A <strong>Surrogate Key</strong> uses a meaningless, system-generated ID (like a UUID). Watch what happens when a customer updates their email address.</div>
+
+            <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap">
+              <button onclick="window.runKeyAnim('natural')" style="background:#fff; border:1.5px solid #E11D48; color:#BE123C; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer">⚠️ Animate: Email updates (Natural Key)</button>
+              <button onclick="window.runKeyAnim('surrogate')" style="background:#fff; border:1.5px solid #059669; color:#047857; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer">🛡️ Animate: Email updates (Surrogate Key)</button>
+              <button onclick="window.resetKeyAnim()" style="background:#f1f5f9; border:none; color:#64748b; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer">↺ Reset</button>
             </div>
-            <div class="xref-hub-label">↓ MDM MATCHING ENGINE identifies these as the same person ↓</div>
-            <div class="master-id-box">
-              <div class="master-id-icon">🏅</div>
-              <div>
-                <div class="master-id-label">MASTER GOLDEN RECORD ID</div>
-                <div class="master-id-val">MDM-GR-0000128371</div>
-                <div class="master-id-note">Tariq Mansour · Trusted across all 4 systems</div>
+
+            <div class="key-grid">
+              <div class="key-box" id="nat-box">
+                <div class="key-header" style="color:#E11D48"><span>⚠️</span> System A: Natural Key</div>
+                <div style="font-size:12px; color:#64748b; margin-bottom:12px">Uses email as the Primary Key.</div>
+                
+                <div class="key-db">
+                  <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-bottom:8px">CUSTOMER_MASTER_TABLE</div>
+                  <div class="db-row"><span>Email_ID <span class="pk-badge">PK</span></span> <strong id="nat-email" style="transition:all .3s">tariq@email.com</strong></div>
+                  <div class="db-row"><span>First_Name</span> <strong>Tariq</strong></div>
+                </div>
+
+                <div class="key-db">
+                  <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-bottom:8px">ORDERS_TRANSACTION_TABLE</div>
+                  <div class="db-row"><span>Order_Num</span> <strong>ORD-9912</strong></div>
+                  <div class="db-row"><span>Cust_Email <span class="pk-badge" style="background:#e2e8f0;color:#64748b">FK</span></span> <strong class="nat-fk" style="transition:all .3s">tariq@email.com</strong></div>
+                </div>
+
+                <div id="key-msg" style="display:none; margin-top:16px; font-size:12px; color:#BE123C; background:#FFF1F2; padding:10px; border-radius:8px; line-height:1.5"></div>
               </div>
-            </div>
-            <div class="xref-table-wrap" style="margin-top:28px">
-              <div class="xref-table-title">
-                📋 XREF TABLE — the identity bridge in the MDM Hub
-                <span style="font-size:11px;font-weight:400;color:#94a3b8">(lives in the MDM database)</span>
-              </div>
-              <table class="xref">
-                <thead>
-                  <tr>
-                    <th>Master ID (Golden Record)</th>
-                    <th>Source System</th>
-                    <th>Source System ID</th>
-                    <th>Source Key Type</th>
-                    <th>Created Date</th>
-                    <th>Active?</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="xref-highlight">MDM-GR-0000128371</td>
-                    <td>🏦 Core Banking (CoreDB)</td>
-                    <td><strong>CUST-00482</strong></td>
-                    <td>Natural Key</td>
-                    <td>2019-03-14</td>
-                    <td>✅ Yes</td>
-                  </tr>
-                  <tr>
-                    <td class="xref-highlight">MDM-GR-0000128371</td>
-                    <td>💳 Card System (FinTech Core)</td>
-                    <td><strong>CC-917-XL</strong></td>
-                    <td>Surrogate Key</td>
-                    <td>2020-07-02</td>
-                    <td>✅ Yes</td>
-                  </tr>
-                  <tr>
-                    <td class="xref-highlight">MDM-GR-0000128371</td>
-                    <td>📱 Mobile App</td>
-                    <td><strong>USR-20220847</strong></td>
-                    <td>System Generated UUID</td>
-                    <td>2022-01-19</td>
-                    <td>✅ Yes</td>
-                  </tr>
-                  <tr>
-                    <td class="xref-highlight">MDM-GR-0000128371</td>
-                    <td>🤝 CRM (CloudCRM)</td>
-                    <td><strong>SF-ACT-7719</strong></td>
-                    <td>CloudCRM Account ID</td>
-                    <td>2021-11-05</td>
-                    <td>✅ Yes</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="xref-explainer">
-              <div class="xref-exp-card">
-                <div class="xref-exp-icon">🔍</div>
-                <div class="xref-exp-title">Why XREF exists</div>
-                <div class="xref-exp-text">Source systems will never agree on a single ID. XREF is the MDM Hub's translation layer — it lets any system look up the master record by its own native ID.</div>
-              </div>
-              <div class="xref-exp-card">
-                <div class="xref-exp-icon">🔄</div>
-                <div class="xref-exp-title">How Reverse Integration uses it</div>
-                <div class="xref-exp-text">When the Golden Record is updated, the MDM engine uses the XREF table to know exactly where to write back — which ID to use in each source system.</div>
-              </div>
-              <div class="xref-exp-card">
-                <div class="xref-exp-icon">⚠️</div>
-                <div class="xref-exp-title">What happens without XREF</div>
-                <div class="xref-exp-text">Without XREF, the MDM Hub has no memory of where records came from. You can't do reverse sync, you can't trace lineage, and merging becomes permanent and dangerous.</div>
+
+              <div class="key-box" id="sur-box">
+                <div class="key-header" style="color:#059669"><span>🛡️</span> System B: Surrogate Key</div>
+                <div style="font-size:12px; color:#64748b; margin-bottom:12px">Uses a system UUID as the Primary Key.</div>
+                
+                <div class="key-db">
+                  <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-bottom:8px">CUSTOMER_MASTER_TABLE</div>
+                  <div class="db-row"><span>Cust_UUID <span class="pk-badge">PK</span></span> <strong>CUST-9928-AB</strong></div>
+                  <div class="db-row"><span>Email_Attr</span> <strong id="sur-email" style="transition:all .3s">tariq@email.com</strong></div>
+                </div>
+
+                <div class="key-db">
+                  <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-bottom:8px">ORDERS_TRANSACTION_TABLE</div>
+                  <div class="db-row"><span>Order_Num</span> <strong>ORD-9912</strong></div>
+                  <div class="db-row"><span>Cust_UUID <span class="pk-badge" style="background:#e2e8f0;color:#64748b">FK</span></span> <strong class="sur-fk" style="transition:all .3s">CUST-9928-AB</strong></div>
+                </div>
+
+                <div id="sur-msg" style="display:none; margin-top:16px; font-size:12px; color:#047857; background:#ECFDF5; padding:10px; border-radius:8px; line-height:1.5"></div>
               </div>
             </div>
+
           </div>
         </div>
+
       `}} />
     </div>
   );
 };
 
-// Dispatcher — renders the right diagram(s) per module
+const DGChaos = ({hex}) => {
+  const [gov, setGov] = React.useState(false);
+  const c = hex;
+  return (
+    <div style={{background:"#F8FAFC",border:"1.5px solid #D9E8F7",borderRadius:16,padding:20,marginBottom:18}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16,flexWrap:"wrap",gap:10}}>
+        <div style={{fontSize:10,color:c,letterSpacing:2,fontWeight:700}}>⚖️ THE VALUE OF GOVERNANCE</div>
+        <div style={{display:"flex",background:"#E2E8F0",borderRadius:20,padding:4,gap:4}}>
+          <button onClick={()=>setGov(false)}
+            style={{background:!gov?"#fff":"transparent",color:!gov?"#E11D48":"#64748B",
+              border:"none",borderRadius:16,padding:"6px 14px",fontSize:12,fontWeight:700,
+              cursor:"pointer",transition:"all .2s",boxShadow:!gov?"0 2px 8px rgba(0,0,0,.1)":"none"}}>
+            ⚠️ Without Governance
+          </button>
+          <button onClick={()=>setGov(true)}
+            style={{background:gov?c:"transparent",color:gov?"#fff":"#64748B",
+              border:"none",borderRadius:16,padding:"6px 14px",fontSize:12,fontWeight:700,
+              cursor:"pointer",transition:"all .2s",boxShadow:gov?`0 2px 8px ${c}66`:"none"}}>
+            🛡️ With Governance
+          </button>
+        </div>
+      </div>
+
+      <div style={{background:gov?"#F5F3FF":"#FFF1F2",border:`2px solid ${gov?"#DDD6FE":"#FECDD3"}`,
+        borderRadius:16,padding:24,transition:"all .4s",position:"relative",overflow:"hidden",minHeight:280}}>
+        
+        <div style={{position:"absolute",right:-20,bottom:-30,fontSize:140,opacity:.05,pointerEvents:"none"}}>
+          {gov?"🛡️":"🔥"}
+        </div>
+
+        {!gov ? (
+          <div style={{animation:"shimIn .3s ease"}}>
+            <div style={{fontSize:15,fontWeight:800,color:"#BE123C",marginBottom:16}}>Scenario: An analyst needs customer data for a campaign.</div>
+            <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
+              <div style={{flex:1,minWidth:200,background:"#fff",border:"1.5px solid #FECDD3",borderRadius:12,padding:14}}>
+                <div style={{fontSize:11,fontWeight:700,color:"#94A3B8",marginBottom:8}}>DATA LAKE (WILD WEST)</div>
+                <div style={{fontSize:13,color:"#BE123C",fontWeight:600,padding:"6px",background:"#FFF1F2",borderRadius:6,marginBottom:6}}>📁 cust_final_v2.csv</div>
+                <div style={{fontSize:13,color:"#BE123C",fontWeight:600,padding:"6px",background:"#FFF1F2",borderRadius:6,marginBottom:6}}>📁 cust_real_final.csv</div>
+                <div style={{fontSize:13,color:"#BE123C",fontWeight:600,padding:"6px",background:"#FFF1F2",borderRadius:6}}>📁 cust_do_not_use.csv</div>
+              </div>
+              <div style={{flex:1,minWidth:200,display:"flex",flexDirection:"column",justifyContent:"center",gap:10}}>
+                <div style={{background:"#fff",border:"1.5px dashed #BE123C",borderLeft:"4px solid #BE123C",borderRadius:8,padding:12,fontSize:12,color:"#1A3050"}}>
+                  <strong style={{color:"#BE123C"}}>❓ Unknown Owner:</strong> "Who do I ask about this data? The guy who built it left 2 years ago."
+                </div>
+                <div style={{background:"#fff",border:"1.5px dashed #BE123C",borderLeft:"4px solid #BE123C",borderRadius:8,padding:12,fontSize:12,color:"#1A3050"}}>
+                  <strong style={{color:"#BE123C"}}>🔓 PII Risk:</strong> Unmasked credit card numbers and emails are visible to everyone.
+                </div>
+                <div style={{background:"#fff",border:"1.5px dashed #BE123C",borderLeft:"4px solid #BE123C",borderRadius:8,padding:12,fontSize:12,color:"#1A3050"}}>
+                  <strong style={{color:"#BE123C"}}>📉 Broken Trust:</strong> "I guessed which table to use. The revenue numbers don't match finance."
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div style={{animation:"shimIn .3s ease"}}>
+            <div style={{fontSize:15,fontWeight:800,color:c,marginBottom:16}}>Scenario: An analyst needs customer data for a campaign.</div>
+            <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
+              <div style={{flex:1,minWidth:200,background:"#fff",border:`1.5px solid ${c}44`,borderRadius:12,padding:14}}>
+                <div style={{fontSize:11,fontWeight:700,color:"#94A3B8",marginBottom:8}}>DATA CATALOG (CERTIFIED)</div>
+                <div style={{fontSize:13,color:c,fontWeight:600,padding:"8px 12px",background:c+"15",borderRadius:8,border:`1.5px solid ${c}`}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <span>📊 Core_Customer_360</span>
+                    <span style={{fontSize:10,background:c,color:"#fff",padding:"2px 6px",borderRadius:4}}>CERTIFIED</span>
+                  </div>
+                </div>
+                <div style={{marginTop:12,fontSize:11,color:"#4A6FA5",lineHeight:1.6}}>
+                  <strong>Business Glossary:</strong> "Official view of active retail customers."<br/>
+                  <strong>Data Quality:</strong> 98% (Checked today)
+                </div>
+              </div>
+              <div style={{flex:1,minWidth:200,display:"flex",flexDirection:"column",justifyContent:"center",gap:10}}>
+                <div style={{background:"#fff",border:`1.5px solid ${c}33`,borderLeft:`4px solid ${c}`,borderRadius:8,padding:12,fontSize:12,color:"#1A3050"}}>
+                  <strong style={{color:c}}>👤 Clear Ownership:</strong> Data Owner: VP of Sales. Data Steward: John Doe.
+                </div>
+                <div style={{background:"#fff",border:`1.5px solid ${c}33`,borderLeft:`4px solid ${c}`,borderRadius:8,padding:12,fontSize:12,color:"#1A3050"}}>
+                  <strong style={{color:c}}>🛡️ Policy Enforced:</strong> Dynamic data masking applied. Analyst only sees last 4 digits of cards.
+                </div>
+                <div style={{background:"#fff",border:`1.5px solid ${c}33`,borderLeft:`4px solid ${c}`,borderRadius:8,padding:12,fontSize:12,color:"#1A3050"}}>
+                  <strong style={{color:c}}>📈 Verified Truth:</strong> Data contracts ensure upstream schema changes don't break this view.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const DGLineage = ({hex}) => {
+  const [node, setNode] = React.useState("mdm");
+  const c = hex;
+  const flow = [
+    {id:"src", label:"Source Systems", icon:"☁️", sub:"CloudCRM", 
+      meta:{owner:"Sarah Jenkins (VP Sales)", steward:"Mike Ross (Sales Ops)", pii:"Yes (Unmasked)", access:"Sales Team Only", glossary:"Raw Lead / Contact"}},
+    {id:"pipe", label:"Ingestion", icon:"⚙️", sub:"Fivetran / Airflow", 
+      meta:{owner:"Data Engineering Team", steward:"Data Pipeline On-Call", pii:"Encrypted in transit", access:"System Level Only", glossary:"Data Integration Pipeline"}},
+    {id:"mdm", label:"MDM Hub", icon:"🏆", sub:"Golden Record", 
+      meta:{owner:"Chief Data Officer", steward:"Priya Sharma (MDM Lead)", pii:"Yes (Tokenized)", access:"Approved Consumers via API", glossary:"Master Customer Entity"}},
+    {id:"bi", label:"BI Dashboard", icon:"📊", sub:"Tableau Exec View", 
+      meta:{owner:"Finance Dept", steward:"David Lee (BI Analyst)", pii:"Aggregated (No PII)", access:"Executive Board", glossary:"Quarterly Churn Metric"}},
+  ];
+  const cur = flow.find(x=>x.id===node);
+
+  return (
+    <div style={{background:"#F8FAFC",border:"1.5px solid #D9E8F7",borderRadius:16,padding:20}}>
+      <div style={{fontSize:10,color:c,letterSpacing:2,fontWeight:700,marginBottom:16}}>🔗 DATA LINEAGE & OWNERSHIP — click any node</div>
+      
+      <div style={{display:"flex",alignItems:"center",justifyContent:"center",flexWrap:"wrap",gap:8,marginBottom:20}}>
+        {flow.map((f, i) => (
+          <React.Fragment key={f.id}>
+            <div onClick={()=>setNode(f.id)}
+              style={{background:node===f.id?c:"#fff",border:`2px solid ${node===f.id?c:c+"44"}`,
+                borderRadius:12,padding:"12px 18px",cursor:"pointer",textAlign:"center",
+                transition:"all .2s",transform:node===f.id?"scale(1.05)":"scale(1)",
+                boxShadow:node===f.id?`0 6px 16px ${c}44`:"none",minWidth:140}}>
+              <div style={{fontSize:24,marginBottom:4}}>{f.icon}</div>
+              <div style={{fontSize:12,fontWeight:800,color:node===f.id?"#fff":c}}>{f.label}</div>
+              <div style={{fontSize:10,color:node===f.id?"#E2E8F0":"#94A3B8"}}>{f.sub}</div>
+            </div>
+            {i < flow.length - 1 && <div style={{color:"#CBD5E1",fontWeight:800,fontSize:18}}>→</div>}
+          </React.Fragment>
+        ))}
+      </div>
+
+      <div style={{background:"#fff",border:`1.5px solid ${c}33`,borderRadius:14,padding:18,animation:"shimIn .25s ease"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,borderBottom:"1.5px solid #F1F5F9",paddingBottom:10}}>
+          <span style={{fontSize:20}}>{cur.icon}</span>
+          <div>
+            <div style={{fontSize:14,fontWeight:800,color:c}}>Governance Metadata Dictionary</div>
+            <div style={{fontSize:11,color:"#94A3B8"}}>Showing accountability policies for: {cur.label}</div>
+          </div>
+        </div>
+        
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))",gap:14}}>
+          <div style={{background:"#F4F9FF",padding:12,borderRadius:8,border:"1px solid #E0F2FE"}}>
+            <div style={{fontSize:10,fontWeight:700,color:"#0284C7",letterSpacing:1,marginBottom:4}}>👔 DATA OWNER</div>
+            <div style={{fontSize:13,fontWeight:600,color:"#1A3050"}}>{cur.meta.owner}</div>
+            <div style={{fontSize:11,color:"#4A6FA5",marginTop:4}}>Accountable for quality & compliance.</div>
+          </div>
+          <div style={{background:"#F5F3FF",padding:12,borderRadius:8,border:"1px solid #DDD6FE"}}>
+            <div style={{fontSize:10,fontWeight:700,color:"#6D28D9",letterSpacing:1,marginBottom:4}}>👷 DATA STEWARD</div>
+            <div style={{fontSize:13,fontWeight:600,color:"#1A3050"}}>{cur.meta.steward}</div>
+            <div style={{fontSize:11,color:"#4A6FA5",marginTop:4}}>Executes daily operations & fixes.</div>
+          </div>
+          <div style={{background:"#FFF1F2",padding:12,borderRadius:8,border:"1px solid #FECDD3"}}>
+            <div style={{fontSize:10,fontWeight:700,color:"#E11D48",letterSpacing:1,marginBottom:4}}>🔒 PII / SECURITY STATUS</div>
+            <div style={{fontSize:13,fontWeight:600,color:"#1A3050"}}>{cur.meta.pii}</div>
+            <div style={{fontSize:11,color:"#4A6FA5",marginTop:4}}>Regulatory classification.</div>
+          </div>
+          <div style={{background:"#FFFBEB",padding:12,borderRadius:8,border:"1px solid #FDE68A"}}>
+            <div style={{fontSize:10,fontWeight:700,color:"#D97706",letterSpacing:1,marginBottom:4}}>📖 GLOSSARY DEFINITION</div>
+            <div style={{fontSize:13,fontWeight:600,color:"#1A3050"}}>{cur.meta.glossary}</div>
+            <div style={{fontSize:11,color:"#4A6FA5",marginTop:4}}>Enterprise agreed meaning.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const DiagramPanel = ({id, hex, light}) => {
   if(id==="dq")  return <DQWheel hex={hex}/>;
   if(id==="etl") return <ETLFlow hex={hex}/>;
   if(id==="mdm") return <MDMDiagram hex={hex}/>;
+  if(id==="dg")  return <><DGChaos hex={hex}/><DGLineage hex={hex}/></>;
   return null;
 };
 
@@ -1941,7 +2198,7 @@ Be thorough but sharp — no filler, no waffle.`;
             ))}
           </div>
 
-          {(mod.id==="dq"||mod.id==="etl"||mod.id==="mdm") && (
+          {(mod.id==="dq"||mod.id==="etl"||mod.id==="mdm"||mod.id==="dg") && (
             <div style={{padding:"0 26px 8px"}}>
               <DiagramPanel id={mod.id} hex={mod.hex} light={mod.light}/>
             </div>
