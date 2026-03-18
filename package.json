@@ -1,0 +1,19 @@
+{
+  "name": "data-alchemist",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Data Alchemist — Raja Shahnawaz Soni",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "build:fast": "node scripts/build.js --no-obfuscate",
+    "deploy:worker": "cd cloudflare && npx wrangler deploy",
+    "secret:set": "cd cloudflare && npx wrangler secret put GOOGLE_SCRIPT_URL"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "@babel/preset-react": "^7.23.3",
+    "javascript-obfuscator": "^4.1.1",
+    "wrangler": "^3.57.0"
+  }
+}

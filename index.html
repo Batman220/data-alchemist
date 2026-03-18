@@ -61,7 +61,9 @@ const AVATAR   = window.__AVATAR__;
 const LINKEDIN = window.__LINKEDIN__;
 
 // ── LOGIN TRACKER ─────────────────────────────────────────────────────────
-const TRACKER_URL = "https://script.google.com/macros/s/AKfycbz5EfcUxWP6v10nBtSyJwqHKRNPD6-1qbEhhqkbZC5QJ_7UlLTRMUZjTP_D9MajwwsW/exec";
+// Set this to your Cloudflare Worker URL after running: npm run deploy:worker
+// e.g. "https://data-alchemist-tracker.YOUR-ACCOUNT.workers.dev"
+const TRACKER_URL = "";
 
 async function trackLogin(name, email, org, keyHint) {
   if (!TRACKER_URL) return;

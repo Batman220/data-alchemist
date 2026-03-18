@@ -1,0 +1,9 @@
+name            = "data-alchemist-tracker"
+main            = "worker.js"
+compatibility_date = "2024-09-23"
+
+# After deploying, set your secret:
+#   npx wrangler secret put GOOGLE_SCRIPT_URL
+#
+# Then update TRACKER_URL in index.html with your Worker URL:
+#   https://data-alchemist-tracker.<your-account>.workers.dev
