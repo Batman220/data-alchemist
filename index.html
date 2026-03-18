@@ -2214,7 +2214,7 @@ const DiagramPanel = ({id, hex, light}) => {
   return null;
 };
 
-const ModCard = ({apiKey, mod, onChat, userEmail}) => {
+const ModCard = ({apiKey, mod, onChat, onClinic, userEmail}) => {
   const [open,setOpen]   = useState(false);
   const [topic,setTopic] = useState(null);
   const [depth,setDepth] = useState("quick");
@@ -2328,6 +2328,14 @@ Be thorough but sharp — no filler, no waffle.`;
                   borderRadius:12,padding:"9px 18px",fontSize:13,fontWeight:600,
                   cursor:"pointer",transition:"all .15s"}}>{b.l}</button>
             ))}
+            {(mod.id==="dq"||mod.id==="etl"||mod.id==="mdm"||mod.id==="dg") && (
+              <button onClick={onClinic}
+                style={{background:"linear-gradient(135deg,#0F172A,#1E1B4B)",border:"1.5px solid rgba(139,92,246,.4)",
+                  color:"#C4B5FD",borderRadius:12,padding:"9px 18px",fontSize:13,fontWeight:700,
+                  cursor:"pointer",transition:"all .15s",boxShadow:"0 2px 12px rgba(139,92,246,.2)"}}>
+                🩺 Case Clinic →
+              </button>
+            )}
           </div>
 
           {(mod.id==="dq"||mod.id==="etl"||mod.id==="mdm"||mod.id==="dg") && (
@@ -2707,6 +2715,434 @@ const QAsk = ({apiKey}) => {
   );
 };
 
+// ─── CASE CLINIC ──────────────────────────────────────────────────────────
+const CLINIC_CASES = [
+  { id:"mdm", icon:"🏆", label:"MDM Match/Merge", color:"#D97706", light:"#FFFBEB", border:"#FDE68A",
+    tagline:"When the golden record turns to fool's gold",
+    pipeline:[
+      {id:"source",  icon:"🗄️", label:"Source Systems",   color:"#059669", desc:"CRM, ERP and portal each hold their own version of the customer."},
+      {id:"ingest",  icon:"📥", label:"Ingest & Stage",    color:"#0891B2", desc:"Raw records land in the staging area — unvalidated, unmatched."},
+      {id:"match",   icon:"🔍", label:"Match Engine",      color:"#D97706", desc:"Probabilistic/deterministic matching runs to find candidate pairs.", failure:true},
+      {id:"merge",   icon:"⚙️", label:"Merge & Survive",  color:"#E11D48", desc:"Survivorship rules pick the winning field value per source.", failure:true},
+      {id:"golden",  icon:"🏆", label:"Golden Record",     color:"#F59E0B", desc:"Single trusted master record published to all downstream systems."},
+    ],
+    failures:[
+      {at:"match", title:"False Match",    desc:"John Smith (Dubai) merged with John Smith (Abu Dhabi) — same name, different people. No address in composite score."},
+      {at:"merge",  title:"Wrong Survivor", desc:"Deprecated CRM wins survivorship because trust scores were set in 2021 and never updated. Stale address goes golden."},
+    ],
+    flowchart:[
+      {step:1, title:"Record Arrives",       content:"New customer record lands from the CRM portal — name, email, address, phone.", risk:null},
+      {step:2, title:"Blocking Applied",     content:"Blocking reduces match candidates: all records sharing the first 3 characters of surname.", risk:"If blocking keys are too narrow, true matches are missed. Too broad = performance dies at scale."},
+      {step:3, title:"Match Scoring",        content:"Each candidate pair gets a composite score: name similarity, address, DOB, email.", risk:"Threshold set at 85%. 'John Smith' scores 91% against any other 'John Smith'. Name alone is never enough."},
+      {step:4, title:"Auto-Merge Decision",  content:"Score > threshold → auto-merge without human review.", risk:"No exception queue. High-risk merges slip through silently. No steward in the loop."},
+      {step:5, title:"Survivorship Runs",    content:"Winning field values selected per source trust scores.", risk:"Trust scores haven't been updated since 2021. Legacy CRM still wins despite being deprecated."},
+      {step:6, title:"Golden Record Published", content:"Merged record written to MDM hub and distributed to downstream systems.", risk:"Downstream receives wrong address, wrong phone. Customer calls go to the wrong person."},
+    ],
+    compare:{
+      wrong:[
+        {label:"Trust scores set once at go-live, never reviewed", icon:"⚠️"},
+        {label:"Match threshold applied uniformly across all domains", icon:"⚠️"},
+        {label:"No manual review queue for near-miss matches (75–89%)", icon:"⚠️"},
+        {label:"Merge happens without data steward sign-off", icon:"⚠️"},
+        {label:"No feedback loop from downstream errors back to weights", icon:"⚠️"},
+      ],
+      right:[
+        {label:"Trust scores reviewed quarterly per source system", icon:"✅"},
+        {label:"Domain-specific thresholds (Customer ≠ Product)", icon:"✅"},
+        {label:"Exception queue for ambiguous scores — steward reviews", icon:"✅"},
+        {label:"Merge audit trail: who approved, when, and why", icon:"✅"},
+        {label:"Downstream error feedback tunes match weights continuously", icon:"✅"},
+      ],
+    },
+    tree:{label:"Why did a false merge happen?", branches:[
+      {label:"Matching algorithm issue", color:"#E11D48", leaves:["Threshold too low for name-only matches","No phonetic matching (Muhammed vs Mohammad)","Address not included in composite score"]},
+      {label:"Trust & survivorship misconfigured", color:"#D97706", leaves:["Deprecated CRM still has highest trust weight","No field-level trust overrides in survivorship","System ignores data freshness when picking winner"]},
+      {label:"Process & governance gap", color:"#6D28D9", leaves:["No steward review queue for ambiguous matches","No unmerge capability deployed","No monthly match quality review meeting"]},
+    ]},
+  },
+  { id:"dq", icon:"🔬", label:"Data Quality Gaps", color:"#0284C7", light:"#E0F2FE", border:"#BAE6FD",
+    tagline:"Garbage that slips through every net",
+    pipeline:[
+      {id:"source",  icon:"🗄️", label:"Source Data",    color:"#059669", desc:"Raw data from operational systems — CRM exports, batch feeds, API calls."},
+      {id:"profile", icon:"📊", label:"Profiling",       color:"#0284C7", desc:"Scan for anomalies, nulls, value distributions and outliers."},
+      {id:"rules",   icon:"📋", label:"DQ Rules Engine", color:"#D97706", desc:"Validate records against defined business rules.", failure:true},
+      {id:"score",   icon:"🎯", label:"DQ Scorecard",    color:"#6D28D9", desc:"Score each record across 6 dimensions — block or warn.", failure:true},
+      {id:"load",    icon:"📥", label:"Trusted Load",    color:"#059669", desc:"Only records above quality threshold move to trusted zone."},
+    ],
+    failures:[
+      {at:"rules",  title:"Rule Coverage Gap",      desc:"Rules check format but not business context. 'N/A' passes email format validation perfectly."},
+      {at:"score",  title:"Threshold Too Lenient",  desc:"70% DQ score triggers a warning, not a block. Bad data flows downstream with a warning nobody reads."},
+    ],
+    flowchart:[
+      {step:1, title:"Data Profiled",          content:"Profiler runs: 3% null email, 8% invalid phone, 12% duplicate name variants across 40,000 records.", risk:null},
+      {step:2, title:"DQ Rules Evaluated",     content:"50 rules applied: format checks, range checks, referential integrity against reference tables.", risk:"Rules were written 3 years ago. New fields added by IT have zero rules. Gaps are completely invisible."},
+      {step:3, title:"DQ Score Calculated",    content:"Completeness 87%, Accuracy 74%, Validity 91%. Composite score: 81%.", risk:"Threshold is 75%. 81% passes — but Accuracy at 74% means 1 in 4 values is wrong."},
+      {step:4, title:"Warning Flags Checked",  content:"12 records flagged as 'warning'. 3,847 records pass cleanly.", risk:"Warnings are logged but never actioned. The steward inbox has 14,000 unreviewed warnings — 9 months old."},
+      {step:5, title:"Data Loaded to DW",      content:"Passing records written to data warehouse for analytics consumption.", risk:null},
+      {step:6, title:"Analytics Report Runs",  content:"Dashboard shows customer segmentation based on loaded data.", risk:"1 in 4 customer attributes is wrong. Entire segmentation model is built on corrupted foundations."},
+    ],
+    compare:{
+      wrong:[
+        {label:"DQ rules written once at launch, never updated", icon:"⚠️"},
+        {label:"Format-only validation — no business-context checks", icon:"⚠️"},
+        {label:"Single composite score hides dimension-level failures", icon:"⚠️"},
+        {label:"Warnings logged but nobody reviews them (14k backlog)", icon:"⚠️"},
+        {label:"DQ checked at load time only — too late to fix at source", icon:"⚠️"},
+      ],
+      right:[
+        {label:"Rules reviewed whenever source schemas change", icon:"✅"},
+        {label:"Business-context rules: 'N/A' fails email check explicitly", icon:"✅"},
+        {label:"Per-dimension thresholds — Accuracy must be ≥ 85% alone", icon:"✅"},
+        {label:"Steward SLA: warnings actioned within 48 hours", icon:"✅"},
+        {label:"DQ enforced at source via data contracts (shift-left)", icon:"✅"},
+      ],
+    },
+    tree:{label:"Why did bad data reach production?", branches:[
+      {label:"Rule design failure", color:"#E11D48", leaves:["Rules are format-only, not semantics-aware","No rules for new fields added post-launch","Regex passes 'N/A' as a valid email address"]},
+      {label:"Threshold & scoring issues", color:"#D97706", leaves:["75% composite threshold too lenient","Accuracy dimension not weighted higher than others","No field-level blocking rules for critical columns"]},
+      {label:"Process breakdown", color:"#6D28D9", leaves:["Warning queue never reviewed (14k backlog)","No data owner for 6 of 14 source systems","DQ reports shared but no remediation SLA exists"]},
+    ]},
+  },
+  { id:"etl", icon:"⚙️", label:"ETL/ELT Breaks", color:"#0891B2", light:"#CFFAFE", border:"#A5F3FC",
+    tagline:"Silent failures that corrupt downstream truth",
+    pipeline:[
+      {id:"source",    icon:"🗄️", label:"Source Extract",  color:"#059669", desc:"Nightly batch pulls records from source CRM via JDBC connection."},
+      {id:"transform", icon:"⚙️", label:"Transform",        color:"#D97706", desc:"Business rules applied: currency, date normalisation, null handling.", failure:true},
+      {id:"validate",  icon:"✅",  label:"Validate",          color:"#0284C7", desc:"Pre-load quality checks: row counts, referential integrity."},
+      {id:"load",      icon:"📥", label:"Load",              color:"#0891B2", desc:"Write transformed records to target DW table.", failure:true},
+      {id:"monitor",   icon:"📊", label:"Monitor",           color:"#6D28D9", desc:"Observe pipeline health: durations, row deltas, error rates."},
+    ],
+    failures:[
+      {at:"transform", title:"Schema Drift",  desc:"Source added 'country_code_v2'. Transform still references 'country_code'. Type mismatch silently propagates NULLs to warehouse."},
+      {at:"load",      title:"Partial Load",  desc:"Load fails mid-run at record 1.4M. No idempotency. Half the data lands. No alert fires. Reports show wrong numbers."},
+    ],
+    flowchart:[
+      {step:1, title:"Source Extraction Runs",     content:"Nightly batch pulls 2M records from source CRM via JDBC. Completes in 23 minutes.", risk:null},
+      {step:2, title:"Transform Stage Executes",   content:"Business rules applied: currency conversion, date normalisation, null handling.", risk:"Source team added 'country_code_v2' last sprint. Transform still references 'country_code'. Type mismatch silently returns NULLs."},
+      {step:3, title:"Validation Checks Run",      content:"Row counts checked: expected 2M, got 2M. Validation passes.", risk:"Row count passes. NULL propagation in country_code isn't caught — no field-level null rate validation exists."},
+      {step:4, title:"Load to Target",             content:"2M records written to DW table. Job reports success at 02:47.", risk:null},
+      {step:5, title:"Downstream Jobs Run",        content:"Regional sales reports aggregate sales by country_code.", risk:"All records have NULL country_code. Regional aggregation returns nothing. Reports show 0 sales everywhere."},
+      {step:6, title:"Business Discovers Error",   content:"Morning meeting: regional dashboard shows zeros. 4 hours to find root cause.", risk:"No alerting on NULL rate increase. No schema change notification from source. No regression test. Completely avoidable."},
+    ],
+    compare:{
+      wrong:[
+        {label:"No schema change notification from source teams", icon:"⚠️"},
+        {label:"Row count is the only validation — field quality ignored", icon:"⚠️"},
+        {label:"Transform hardcodes field names with no drift detection", icon:"⚠️"},
+        {label:"No NULL rate monitoring on business-critical columns", icon:"⚠️"},
+        {label:"No automated rollback or idempotency on load failure", icon:"⚠️"},
+      ],
+      right:[
+        {label:"Data contracts with source teams — schema changes require PR", icon:"✅"},
+        {label:"Field-level null rate + value range validation post-transform", icon:"✅"},
+        {label:"Schema-aware transforms: detect drift, alert and halt", icon:"✅"},
+        {label:"Alert fires if NULL rate on critical field exceeds 1%", icon:"✅"},
+        {label:"Idempotent loads: full rollback if any stage fails", icon:"✅"},
+      ],
+    },
+    tree:{label:"Why did the pipeline fail silently?", branches:[
+      {label:"No schema governance", color:"#E11D48", leaves:["Source team changed schema without notifying consumers","No data contract enforced at the source boundary","No schema registry to detect and version drift"]},
+      {label:"Weak validation layer", color:"#D97706", leaves:["Only row count validated — not field-level quality","No null rate threshold on critical columns","No type mismatch detection during transform"]},
+      {label:"Missing observability", color:"#6D28D9", leaves:["No alert on NULL rate increase in loaded data","No SLA monitoring on downstream report freshness","No lineage to trace root cause in under 10 minutes"]},
+    ]},
+  },
+  { id:"dg", icon:"⚖️", label:"Governance Breakdown", color:"#6D28D9", light:"#F5F3FF", border:"#DDD6FE",
+    tagline:"Data without ownership is data without trust",
+    pipeline:[
+      {id:"create",   icon:"✏️", label:"Data Created",   color:"#059669", desc:"New dataset created by a business unit to solve an immediate problem."},
+      {id:"classify", icon:"🏷️", label:"Classify",       color:"#0284C7", desc:"Assign data owner, steward, sensitivity label and purpose.", failure:true},
+      {id:"policy",   icon:"📋", label:"Apply Policy",   color:"#D97706", desc:"Enforce access controls, retention schedule and quality rules.", failure:true},
+      {id:"catalog",  icon:"📚", label:"Catalog",        color:"#6D28D9", desc:"Register in data catalog with full lineage and documentation."},
+      {id:"audit",    icon:"🔍", label:"Audit Trail",    color:"#E11D48", desc:"Log all access, changes and deletions to immutable trail."},
+    ],
+    failures:[
+      {at:"classify", title:"No Data Owner",       desc:"BI team creates a customer segmentation dataset. No owner assigned. 18 months later nobody knows what it is, who maintains it, or whether it's still accurate."},
+      {at:"policy",   title:"Policy Never Applied", desc:"PII fields exposed in analytics environment. Retention policy doesn't cover cloud storage. Live GDPR breach risk."},
+    ],
+    flowchart:[
+      {step:1, title:"New Dataset Created",       content:"BI team builds a customer segmentation dataset from CRM exports. Pushed to shared drive.", risk:null},
+      {step:2, title:"Ownership Assignment",      content:"No ownership workflow is triggered.", risk:"No mandatory owner field in dataset creation. 40% of all datasets have no registered owner. Nobody responsible."},
+      {step:3, title:"Sensitivity Classification", content:"Contains email, phone, purchase history. Should be classified HIGH / PII.", risk:"Manual classification relies on creator's judgement. Creator doesn't know the PII policy. Files as 'Internal'."},
+      {step:4, title:"Access Control Applied",    content:"'Internal' = accessible to all 400 employees across all departments.", risk:"PII data visible to finance, ops, IT helpdesk — nobody who needs it for the stated purpose."},
+      {step:5, title:"Retention Managed",         content:"Dataset sits on cloud storage indefinitely.", risk:"No retention policy triggered. GDPR requires deletion after purpose expires. 3-year-old customer data still live."},
+      {step:6, title:"Compliance Audit",          content:"GDPR audit asks: who accessed this data, when, and for what purpose?", risk:"No audit trail. No lineage. No access log. DPA investigation begins. €20M fine risk."},
+    ],
+    compare:{
+      wrong:[
+        {label:"No mandatory data owner field on dataset creation", icon:"⚠️"},
+        {label:"Sensitivity classification left to creator's judgement", icon:"⚠️"},
+        {label:"Policies exist in documents — not enforced in systems", icon:"⚠️"},
+        {label:"No retention schedule for cloud-stored datasets", icon:"⚠️"},
+        {label:"No audit trail for PII field access", icon:"⚠️"},
+      ],
+      right:[
+        {label:"Owner field mandatory — creation blocked without it", icon:"✅"},
+        {label:"Auto-classification via field-level PII detection", icon:"✅"},
+        {label:"Sensitivity label auto-triggers policy enforcement", icon:"✅"},
+        {label:"Retention schedule auto-assigned by data type and region", icon:"✅"},
+        {label:"All PII access logged to immutable, queryable audit trail", icon:"✅"},
+      ],
+    },
+    tree:{label:"Why did ungoverned data reach production?", branches:[
+      {label:"Ownership vacuum", color:"#E11D48", leaves:["No owner assignment workflow in dataset creation flow","Business units create data without notifying data governance","Data catalog is opt-in — most teams never register"]},
+      {label:"Policy not enforced in systems", color:"#D97706", leaves:["Classification is manual and inconsistent across teams","Policies live in Word docs, not enforcement systems","No automated mapping from sensitivity label to access rule"]},
+      {label:"No visibility or lineage", color:"#6D28D9", leaves:["No catalog entry means no lineage tracking downstream","No access log for sensitive datasets (GDPR requirement)","No compliance dashboard for data stewards to monitor"]},
+    ]},
+  },
+];
+
+const ClinicPipeline = ({stages, failures, color}) => {
+  const [sel, setSel] = React.useState(null);
+  const failSet = new Set(failures.map(f=>f.at));
+  const selStage = stages.find(s=>s.id===sel);
+  const selFailure = failures.find(f=>f.at===sel);
+  return (
+    <div>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:0,flexWrap:"wrap",rowGap:16,marginBottom:20}}>
+        {stages.map((s,i)=>(
+          <React.Fragment key={s.id}>
+            <div onClick={()=>setSel(sel===s.id?null:s.id)}
+              style={{textAlign:"center",cursor:"pointer",padding:"14px 16px",borderRadius:16,minWidth:100,
+                background:sel===s.id?(failSet.has(s.id)?s.color+"33":"rgba(255,255,255,.12)"):(failSet.has(s.id)?"rgba(225,29,72,.12)":"rgba(255,255,255,.04)"),
+                border:`2px solid ${sel===s.id?s.color:(failSet.has(s.id)?"#E11D48":"rgba(255,255,255,.1)")}`,
+                transition:"all .2s",transform:sel===s.id?"scale(1.08)":"scale(1)",
+                boxShadow:sel===s.id?`0 8px 24px ${s.color}44`:"none",position:"relative"}}>
+              {failSet.has(s.id) && (
+                <div style={{position:"absolute",top:-8,right:-8,background:"#E11D48",color:"#fff",borderRadius:"50%",
+                  width:20,height:20,fontSize:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",
+                  animation:"pingDot 1.5s ease-in-out infinite"}}>!</div>
+              )}
+              <div style={{fontSize:24,marginBottom:6}}>{s.icon}</div>
+              <div style={{fontFamily:"Bricolage Grotesque,sans-serif",fontSize:11,fontWeight:800,letterSpacing:.3,
+                color:sel===s.id?"#fff":(failSet.has(s.id)?"#FCA5A5":"rgba(255,255,255,.7)")}}>{s.label}</div>
+            </div>
+            {i<stages.length-1 && (
+              <div style={{fontSize:18,color:"rgba(255,255,255,.2)",padding:"0 3px",flexShrink:0}}>
+                {failSet.has(stages[i+1]?.id)?<span style={{color:"#E11D48",animation:"pingDot 1.5s ease-in-out infinite"}}>→</span>:"→"}
+              </div>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+      {sel && selStage && (
+        <div style={{background:"rgba(255,255,255,.04)",border:`1.5px solid ${selStage.color}55`,borderRadius:16,padding:20,animation:"shimIn .25s ease"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+            <span style={{fontSize:22}}>{selStage.icon}</span>
+            <div style={{fontFamily:"Bricolage Grotesque,sans-serif",fontSize:15,fontWeight:800,color:selStage.color}}>{selStage.label}</div>
+            {failSet.has(sel) && <span style={{background:"#E11D48",color:"#fff",fontSize:10,fontWeight:700,borderRadius:8,padding:"2px 10px",letterSpacing:.8}}>FAILURE POINT</span>}
+          </div>
+          <div style={{fontSize:13,color:"rgba(255,255,255,.7)",lineHeight:1.7,marginBottom:selFailure?14:0}}>{selStage.desc}</div>
+          {selFailure && (
+            <div style={{background:"rgba(225,29,72,.15)",border:"1.5px solid rgba(225,29,72,.4)",borderRadius:12,padding:"12px 16px"}}>
+              <div style={{fontSize:11,fontWeight:700,color:"#FCA5A5",letterSpacing:1,marginBottom:5}}>⚠️ REAL FAILURE: {selFailure.title}</div>
+              <div style={{fontSize:13,color:"rgba(255,255,255,.72)",lineHeight:1.65}}>{selFailure.desc}</div>
+            </div>
+          )}
+        </div>
+      )}
+      {!sel && (
+        <div style={{textAlign:"center",color:"rgba(255,255,255,.3)",fontSize:13,padding:"6px 0"}}>
+          <span style={{color:"#E11D48",fontWeight:700}}>!</span> = known failure point · click any stage to inspect
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ClinicFlowchart = ({steps, color, step, setStep}) => {
+  const s = steps[step];
+  return (
+    <div style={{background:"#fff",border:"1.5px solid #D9E8F7",borderRadius:20,padding:28}}>
+      <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:22,flexWrap:"wrap"}}>
+        {steps.map((st,i)=>(
+          <React.Fragment key={i}>
+            <button onClick={()=>setStep(i)}
+              style={{width:32,height:32,borderRadius:"50%",border:`2px solid ${i===step?color:i<step?"#059669":"#D9E8F7"}`,
+                background:i===step?color:i<step?"#059669":"#fff",
+                color:i<=step?"#fff":"#94A3B8",fontSize:12,fontWeight:800,cursor:"pointer",
+                transition:"all .2s",flexShrink:0}}>
+              {i<step?"✓":i+1}
+            </button>
+            {i<steps.length-1 && <div style={{flex:1,height:2,minWidth:6,background:i<step?"#059669":"#E2E8F0",borderRadius:1}}/>}
+          </React.Fragment>
+        ))}
+      </div>
+      <div style={{animation:"shimIn .3s ease"}}>
+        <div style={{fontSize:10,fontWeight:700,color:"#94A3B8",letterSpacing:1.5,marginBottom:8}}>STEP {s.step} OF {steps.length}</div>
+        <div style={{fontFamily:"Bricolage Grotesque,sans-serif",fontSize:19,fontWeight:800,color:"#08142A",marginBottom:12}}>{s.title}</div>
+        <div style={{background:"#F8FAFC",border:"1.5px solid #E2E8F0",borderRadius:14,padding:"14px 18px",fontSize:14,color:"#1A3050",lineHeight:1.75,marginBottom:s.risk?14:0}}>{s.content}</div>
+        {s.risk
+          ? <div style={{background:"#FFF1F2",border:"1.5px solid #FECDD3",borderRadius:14,padding:"12px 18px",display:"flex",gap:12,alignItems:"flex-start"}}>
+              <span style={{fontSize:20,flexShrink:0}}>⚠️</span>
+              <div><div style={{fontSize:11,fontWeight:700,color:"#E11D48",letterSpacing:1,marginBottom:4}}>WHERE IT GOES WRONG</div>
+              <div style={{fontSize:13,color:"#BE123C",lineHeight:1.7}}>{s.risk}</div></div>
+            </div>
+          : <div style={{background:"#ECFDF5",border:"1.5px solid #A7F3D0",borderRadius:14,padding:"10px 16px",display:"flex",gap:10,alignItems:"center"}}>
+              <span style={{fontSize:18}}>✅</span>
+              <div style={{fontSize:13,color:"#065F46",fontWeight:600}}>This step runs correctly — no failure here</div>
+            </div>
+        }
+      </div>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:22}}>
+        <button onClick={()=>setStep(Math.max(0,step-1))} disabled={step===0}
+          style={{background:step===0?"#F8FAFC":"#fff",border:"1.5px solid #D9E8F7",color:step===0?"#CBD5E1":"#4A6FA5",
+            borderRadius:12,padding:"9px 20px",fontSize:13,fontWeight:700,cursor:step===0?"not-allowed":"pointer"}}>← Previous</button>
+        <span style={{fontSize:12,color:"#94A3B8"}}>{step+1} / {steps.length}</span>
+        <button onClick={()=>setStep(Math.min(steps.length-1,step+1))} disabled={step===steps.length-1}
+          style={{background:step===steps.length-1?"#F8FAFC":color,border:`1.5px solid ${step===steps.length-1?"#D9E8F7":color}`,
+            color:step===steps.length-1?"#CBD5E1":"#fff",
+            borderRadius:12,padding:"9px 20px",fontSize:13,fontWeight:700,cursor:step===steps.length-1?"not-allowed":"pointer"}}>Next →</button>
+      </div>
+    </div>
+  );
+};
+
+const ClinicCompare = ({compare, color}) => (
+  <div style={{display:"flex",gap:18,flexWrap:"wrap"}}>
+    <div style={{flex:"1 1 280px",background:"#FFF1F2",border:"1.5px solid #FECDD3",borderRadius:18,padding:22}}>
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+        <div style={{width:34,height:34,borderRadius:"50%",background:"#E11D48",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:16,fontWeight:800}}>✗</div>
+        <div><div style={{fontFamily:"Bricolage Grotesque,sans-serif",fontSize:15,fontWeight:800,color:"#BE123C"}}>The Wrong Way</div>
+          <div style={{fontSize:11,color:"#E11D48",fontWeight:600}}>How it usually fails</div></div>
+      </div>
+      {compare.wrong.map((w,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:10,padding:"9px 13px",background:"rgba(255,255,255,.6)",borderRadius:10,border:"1px solid #FECDD3"}}>
+          <span style={{fontSize:14,flexShrink:0}}>{w.icon}</span>
+          <div style={{fontSize:13,color:"#BE123C",lineHeight:1.6}}>{w.label}</div>
+        </div>
+      ))}
+    </div>
+    <div style={{flex:"1 1 280px",background:"#ECFDF5",border:"1.5px solid #A7F3D0",borderRadius:18,padding:22}}>
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+        <div style={{width:34,height:34,borderRadius:"50%",background:"#059669",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:16,fontWeight:800}}>✓</div>
+        <div><div style={{fontFamily:"Bricolage Grotesque,sans-serif",fontSize:15,fontWeight:800,color:"#065F46"}}>The Right Way</div>
+          <div style={{fontSize:11,color:"#059669",fontWeight:600}}>What actually works</div></div>
+      </div>
+      {compare.right.map((r,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:10,padding:"9px 13px",background:"rgba(255,255,255,.6)",borderRadius:10,border:"1px solid #A7F3D0"}}>
+          <span style={{fontSize:14,flexShrink:0}}>{r.icon}</span>
+          <div style={{fontSize:13,color:"#065F46",lineHeight:1.6}}>{r.label}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const ClinicTree = ({tree, color, open, setOpen}) => {
+  const toggle = (i) => setOpen(p=>({...p,[i]:!p[i]}));
+  return (
+    <div style={{background:"#fff",border:"1.5px solid #D9E8F7",borderRadius:20,padding:26}}>
+      <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:22,padding:"14px 18px",
+        background:`linear-gradient(135deg,${color}12,${color}06)`,border:`1.5px solid ${color}33`,borderRadius:14}}>
+        <span style={{fontSize:26}}>🌳</span>
+        <div><div style={{fontSize:10,color:color,fontWeight:700,letterSpacing:1,marginBottom:3}}>ROOT QUESTION</div>
+          <div style={{fontFamily:"Bricolage Grotesque,sans-serif",fontSize:16,fontWeight:800,color:"#08142A"}}>{tree.label}</div></div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        {tree.branches.map((b,i)=>(
+          <div key={i}>
+            <button onClick={()=>toggle(i)}
+              style={{width:"100%",textAlign:"left",background:open[i]?b.color+"14":"#F8FAFC",
+                border:`1.5px solid ${open[i]?b.color:"#D9E8F7"}`,borderRadius:13,padding:"13px 16px",
+                cursor:"pointer",transition:"all .2s",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <div style={{width:10,height:10,borderRadius:"50%",background:b.color,flexShrink:0}}/>
+                <span style={{fontFamily:"Bricolage Grotesque,sans-serif",fontSize:14,fontWeight:800,color:open[i]?b.color:"#08142A"}}>{b.label}</span>
+              </div>
+              <span style={{fontSize:17,color:b.color,fontWeight:700,transition:"transform .2s",transform:open[i]?"rotate(90deg)":"rotate(0)"}}>›</span>
+            </button>
+            {open[i] && (
+              <div style={{marginTop:6,marginLeft:22,display:"flex",flexDirection:"column",gap:6,animation:"shimIn .25s ease"}}>
+                {b.leaves.map((leaf,j)=>(
+                  <div key={j} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"9px 14px",
+                    background:"#fff",border:`1.5px solid ${b.color}33`,borderRadius:11}}>
+                    <div style={{width:6,height:6,borderRadius:"50%",background:b.color,marginTop:5,flexShrink:0}}/>
+                    <div style={{fontSize:13,color:"#1A3050",lineHeight:1.65}}>{leaf}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const CaseClinic = () => {
+  const [activeCase, setActiveCase] = React.useState("mdm");
+  const [activeView, setActiveView] = React.useState("pipeline");
+  const [flowStep, setFlowStep] = React.useState(0);
+  const [treeOpen, setTreeOpen] = React.useState({});
+  const c = CLINIC_CASES.find(x=>x.id===activeCase);
+  const views = [
+    {id:"pipeline",  label:"⚡ Pipeline",     desc:"See where data breaks"},
+    {id:"flowchart", label:"🗺️ Flowchart",    desc:"Step through the scenario"},
+    {id:"compare",   label:"⚖️ Compare",      desc:"Wrong vs Right way"},
+    {id:"tree",      label:"🌳 Failure Tree",  desc:"Diagnose root causes"},
+  ];
+  const switchCase = (id) => { setActiveCase(id); setActiveView("pipeline"); setFlowStep(0); setTreeOpen({}); };
+  return (
+    <div>
+      {/* Header */}
+      <div style={{background:"linear-gradient(135deg,#0F172A 0%,#1E1B4B 50%,#0F172A 100%)",borderRadius:24,padding:"30px 32px",marginBottom:20,position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(139,92,246,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,.08) 1px,transparent 1px)",backgroundSize:"32px 32px",borderRadius:24,pointerEvents:"none"}}/>
+        <div style={{position:"relative",zIndex:1}}>
+          <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:18}}>
+            <div style={{fontSize:38}}>🩺</div>
+            <div>
+              <div style={{fontFamily:"Bricolage Grotesque,sans-serif",fontSize:26,fontWeight:800,color:"#fff",letterSpacing:"-1px",lineHeight:1}}>Case Clinic</div>
+              <div style={{fontSize:12,color:"rgba(255,255,255,.45)",marginTop:4}}>Real-world data management failures — diagnosed, dissected, fixed</div>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            {CLINIC_CASES.map(cc=>(
+              <button key={cc.id} onClick={()=>switchCase(cc.id)}
+                style={{background:activeCase===cc.id?cc.color:"rgba(255,255,255,.06)",
+                  border:`1.5px solid ${activeCase===cc.id?cc.color:"rgba(255,255,255,.12)"}`,
+                  color:activeCase===cc.id?"#fff":"rgba(255,255,255,.65)",
+                  borderRadius:14,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",
+                  transition:"all .2s",boxShadow:activeCase===cc.id?`0 4px 18px ${cc.color}55`:"none"}}>
+                {cc.icon} {cc.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Active case tagline */}
+      <div style={{background:`linear-gradient(135deg,${c.light},#fff)`,border:`1.5px solid ${c.border}`,borderRadius:16,padding:"16px 22px",marginBottom:18,display:"flex",alignItems:"center",gap:14}}>
+        <div style={{fontSize:36}}>{c.icon}</div>
+        <div>
+          <div style={{fontFamily:"Bricolage Grotesque,sans-serif",fontSize:18,fontWeight:800,color:c.color}}>{c.label}</div>
+          <div style={{fontSize:13,color:"#4A6FA5",marginTop:2,fontStyle:"italic"}}>{c.tagline}</div>
+        </div>
+      </div>
+
+      {/* View tabs */}
+      <div style={{display:"flex",gap:8,marginBottom:18,flexWrap:"wrap"}}>
+        {views.map(v=>(
+          <button key={v.id} onClick={()=>setActiveView(v.id)}
+            style={{background:activeView===v.id?c.color:"#fff",
+              border:`1.5px solid ${activeView===v.id?c.color:"#D9E8F7"}`,
+              color:activeView===v.id?"#fff":"#4A6FA5",borderRadius:12,padding:"9px 18px",
+              fontSize:13,fontWeight:700,cursor:"pointer",transition:"all .15s"}}>{v.label}</button>
+        ))}
+      </div>
+
+      {activeView==="pipeline" && (
+        <div style={{background:"#0F172A",borderRadius:20,padding:"28px 24px",border:"1px solid rgba(255,255,255,.07)"}}>
+          <div style={{fontSize:10,color:"rgba(255,255,255,.35)",letterSpacing:2,fontWeight:700,marginBottom:22}}>⚡ ANIMATED PIPELINE — CLICK A STAGE TO INSPECT</div>
+          <ClinicPipeline stages={c.pipeline} failures={c.failures} color={c.color}/>
+        </div>
+      )}
+      {activeView==="flowchart" && <ClinicFlowchart steps={c.flowchart} color={c.color} step={flowStep} setStep={setFlowStep}/>}
+      {activeView==="compare"   && <ClinicCompare compare={c.compare} color={c.color}/>}
+      {activeView==="tree"      && <ClinicTree tree={c.tree} color={c.color} open={treeOpen} setOpen={setTreeOpen}/>}
+    </div>
+  );
+};
+
 const App = () => {
   const [key,setKey]     = useState("");
   const [uname,setUname] = useState("");
@@ -2722,7 +3158,7 @@ const App = () => {
   );
 
   function jump(id) { setTab("modules"); setHl(id); setTimeout(()=>setHl(null),2000); }
-  const tabs = [{id:"modules",l:"📚 Modules"},{id:"schedule",l:"📅 Schedule"},{id:"methods",l:"🛠️ Methods"}];
+  const tabs = [{id:"modules",l:"📚 Modules"},{id:"schedule",l:"📅 Schedule"},{id:"methods",l:"🛠️ Methods"},{id:"clinic",l:"🩺 Case Clinic"}];
 
   return (
     <div style={{minHeight:"100vh",background:"var(--bg)",position:"relative"}}>
@@ -2835,13 +3271,14 @@ const App = () => {
             {MODS.map(m=>(
               <div key={m.id} style={{outline:hl===m.id?`3px solid ${m.hex}`:"none",
                 borderRadius:24,transition:"outline .3s"}}>
-                <ModCard apiKey={key} mod={m} onChat={(m,mode)=>setChat({mod:m,mode})} userEmail={email}/>
+                <ModCard apiKey={key} mod={m} onChat={(m,mode)=>setChat({mod:m,mode})} onClinic={()=>setTab("clinic")} userEmail={email}/>
               </div>
             ))}
           </div>
         )}
         {tab==="schedule" && <Schedule/>}
         {tab==="methods"  && <Methods onProbe={()=>setProbe(true)}/>}
+        {tab==="clinic"   && <CaseClinic/>}
       </div>
 
       <div style={{background:"linear-gradient(135deg,#FFFBEB,#FEF3C7)",borderTop:"1.5px solid #FDE68A",padding:"22px 24px",position:"relative",zIndex:1}}>
